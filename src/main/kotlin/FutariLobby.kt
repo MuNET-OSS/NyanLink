@@ -1,5 +1,6 @@
 package aquadx
 
+import com.alibaba.fastjson2.toJSONString
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
@@ -72,6 +73,8 @@ fun Application.configureRouting() = routing {
     }
 
     get("/info") {
-        call.respond(mapOf("relayHost" to "futari.aquadx.net", "relayPort" to 20101))
+        mapOf("relayHost" to call.request.local.remoteHost, "relayPort" to 20101).ok()
     }
 }
+
+inline fun <reified T> T.ok() { throw ApiException(200, toJSONString()) }
