@@ -35,15 +35,15 @@ jobs:
         # for Windows using the --win-* flags only if you have the right cross-toolchain set up. 
         # Typically, you'd run this step on Windows if you want an actual .exe.
         # For demonstration, here's how you'd do it on a Windows runner:
-        # if: runner.os == 'Windows'
+        if: runner.os == 'Windows'
         run: |
-          jpackage ^
-            --type exe ^
-            --name "WorldLinkD" ^
-            --input .\build\libs ^
-            --main-jar "worldlinkd.jar" ^
-            --main-class "aquadx.ApplicationKt" ^
-            --java-options "-Xmx512m" ^
+          jpackage \
+            --type exe \
+            --name "WorldLinkD" \
+            --input .\build\libs \
+            --main-jar "worldlinkd.jar" \
+            --main-class "aquadx.ApplicationKt" \
+            --java-options "-Xmx512m" \
             --win-console
 
       - name: Release
