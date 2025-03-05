@@ -5,6 +5,7 @@ on:
     tags:
       - 'v*.*.*'  # runs only on tags starting with v
 
+permissions: write-all
 jobs:
   build_and_release:
     runs-on: ubuntu-latest
