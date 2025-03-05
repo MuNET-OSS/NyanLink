@@ -10,7 +10,7 @@ import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 
 fun main(args: Array<String>) {
-    embeddedServer(Netty, port = 8080, module = Application::module).start()
+    embeddedServer(Netty, port = 20100, module = Application::module).start()
     FutariRelay().start()
 }
 

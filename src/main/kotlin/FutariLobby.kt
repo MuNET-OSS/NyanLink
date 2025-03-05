@@ -49,7 +49,7 @@ fun Application.configureRouting() = routing {
         call.respondText("Running!")
     }
 
-    get("/recruit/start") {
+    post("/recruit/start") {
         val d = call.receive<RecruitRecord>().apply { Time = millis() }
         val exists = recruits.containsKey(d.ip)
         recruits[d.ip] = d
@@ -73,7 +73,24 @@ fun Application.configureRouting() = routing {
     }
 
     get("/info") {
-        mapOf("relayHost" to call.request.local.remoteHost, "relayPort" to 20101).ok()
+        mapOf(
+            "relayHost" to call.request.local.serverHost,
+            "relayPort" to 20101
+        ).ok()
+    }
+
+    get("/debug") {
+        mapOf(
+            "serverHost" to call.request.local.serverHost,
+            "remoteHost" to call.request.local.remoteHost,
+            "localHost" to call.request.local.localHost,
+            "serverPort" to call.request.local.serverPort,
+            "remotePort" to call.request.local.remotePort,
+            "localPort" to call.request.local.localPort,
+            "uri" to call.request.uri,
+            "method" to call.request.httpMethod.value,
+            "headers" to call.request.headers.entries().joinToString("\n") { (k, v) -> "$k: $v" }
+        ).ok()
     }
 }
 
