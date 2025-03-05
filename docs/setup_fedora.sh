@@ -11,7 +11,7 @@ set -e
 chsh -s "$(which zsh)"
 
 # 2. Install JDK 21
-dnf install java-21-openjdk -y
+dnf install java-21-openjdk ufw -y
 
 # 3. Make the user
 useradd --system --no-create-home --shell /usr/sbin/nologin worldlinkd
@@ -28,3 +28,26 @@ chmod 750 /app/wl/update.sh
 curl -sL https://raw.githubusercontent.com/MewoLab/worldlinkd/refs/heads/main/docs/worldlinkd.service > /etc/systemd/system/worldlinkd.service
 systemctl daemon-reload
 systemctl enable worldlinkd --now
+
+# 6. Setup tailscale
+curl -fsSL https://tailscale.com/install.sh | sh
+tailscale up
+
+# 7. Setup firewall
+ufw enable
+ufw allow 20100
+ufw allow 20101
+
+# 8. Install ipv6 support
+setup_ipv6() {
+    addr="$1"
+    gateway="$2"
+    nmcli connection modify "cloud-init ens3" ipv6.address "$addr/64"
+    nmcli connection modify "cloud-init ens3" ipv6.gateway "$gateway"
+    nmcli connection modify "cloud-init ens3" ipv6.dns "2001:4860:4860::8844 2001:4860:4860::8888"
+    nmcli connection up "cloud-init ens3"
+}
+# Prompt user to enter ipv6 address and gateway
+echo "Enter your IPv6 address and gateway separated by a space:"
+read -r addr gateway
+setup_ipv6 "$addr" "$gateway"
