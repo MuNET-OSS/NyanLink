@@ -10,12 +10,17 @@ ufw allow 80 443
 
 # Ask user to input domain name
 echo "Enter your domain name (e.g. example.com):"
-read DOMAIN_NAME
 
 # Create Caddyfile
 echo "Creating Caddyfile..."
 cat <<EOF > /etc/caddy/Caddyfile
-${DOMAIN_NAME} {
+${1} {
     reverse_proxy localhost:20100
 }
 EOF
+
+# Reload Caddy
+echo "Reloading Caddy..."
+systemctl reload caddy
+
+echo "Caddy setup complete."
