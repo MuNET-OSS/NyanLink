@@ -11,7 +11,7 @@ set -e
 chsh -s "$(which zsh)"
 
 # 2. Install JDK 21
-dnf install java-21-openjdk ufw -y
+dnf install java-21-openjdk ufw ethtool -y
 
 # 3. Make the user
 useradd --system --no-create-home --shell /usr/sbin/nologin worldlinkd
@@ -32,6 +32,10 @@ systemctl enable worldlinkd --now
 # 6. Setup tailscale
 curl -fsSL https://tailscale.com/install.sh | sh
 tailscale up
+echo 'net.ipv4.ip_forward = 1' | sudo tee -a /etc/sysctl.d/99-tailscale.conf
+echo 'net.ipv6.conf.all.forwarding = 1' | sudo tee -a /etc/sysctl.d/99-tailscale.conf
+sysctl -p /etc/sysctl.d/99-tailscale.conf
+tailscale up --advertise-exit-node
 
 # 7. Setup firewall
 ufw enable
