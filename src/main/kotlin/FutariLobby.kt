@@ -27,12 +27,13 @@ const val MAX_TTL = 30 * 1000
 
 val RecruitRecord.ip get() = RecruitInfo.MechaInfo.IpAddress
 
+// <IP Address, RecruitInfo>
+val recruits = ConcurrentHashMap<UInt, RecruitRecord>()
+// Append writer
+val writer: BufferedWriter = FileOutputStream(File("recruit.log"), true).bufferedWriter()
+val mutex = Mutex()
+
 fun Application.configureRouting() = routing {
-    // <IP Address, RecruitInfo>
-    val recruits = ConcurrentHashMap<UInt, RecruitRecord>()
-    // Append writer
-    val writer: BufferedWriter = FileOutputStream(File("recruit.log"), true).bufferedWriter()
-    val mutex = Mutex()
     val log = logger()
 
     suspend fun log(data: String) = mutex.withLock {

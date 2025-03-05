@@ -11,10 +11,16 @@ group = "aquadx"
 version = "0.0.1"
 
 application {
-    mainClass = "io.ktor.server.netty.EngineMain"
+    mainClass = "aquadx.ApplicationKt"
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
+}
+
+ktor {
+    fatJar {
+        archiveFileName.set("worldlinkd.jar")
+    }
 }
 
 repositories {
@@ -36,7 +42,6 @@ dependencies {
     }
     runtimeOnly("org.tinylog:slf4j-tinylog:2.7.0")
     implementation("org.tinylog:tinylog-impl:2.7.0")
-
 
     // JSON
     implementation("com.alibaba.fastjson2:fastjson2-kotlin:2.0.56")
