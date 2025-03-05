@@ -78,25 +78,9 @@ ufw allow 20101
 # 8. (Optional) IPv6 setup via NetworkManager
 ###############################################################################
 # Make sure NetworkManager and nmcli are installed:
-# apt-get install -y network-manager
-#
-# You must also ensure your interface name and connection match your environment.
-# Commonly, Debian 12 uses interface names like ens3 or enp1s0. The connection
-# name might differ, or you might not be using "cloud-init ens3". Adjust as needed.
+curl -sL https://raw.githubusercontent.com/MewoLab/worldlinkd/refs/heads/main/docs/ipv6.py \
+    > /tmp/ipv6.py
+python3 /tmp/ipv6.py
+netplan apply --debug
 
-# setup_ipv6() {
-#     addr="$1"
-#     gateway="$2"
-#     nmcli connection modify "cloud-init ens3" ipv6.addresses "${addr}/64"
-#     nmcli connection modify "cloud-init ens3" ipv6.gateway "$gateway"
-#     nmcli connection modify "cloud-init ens3" ipv6.dns "2001:4860:4860::8844 2001:4860:4860::8888"
-#     nmcli connection up "cloud-init ens3"
-# }
-#
-# echo "Enter your IPv6 address and gateway separated by a space (or leave blank to skip):"
-# read -r addr gateway
-# if [ -n "$addr" ] && [ -n "$gateway" ]; then
-#     setup_ipv6 "$addr" "$gateway"
-# fi
-
-echo "Setup complete! Please manually configure ipv6 https://docs.digitalocean.com/products/networking/ipv6/how-to/enable/#on-existing-droplets"
+echo "Setup complete!"
