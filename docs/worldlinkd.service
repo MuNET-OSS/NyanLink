@@ -1,0 +1,20 @@
+# /etc/systemd/system/worldlinkd.service
+
+[Unit]
+Description=WorldLink Daemon
+After=network.target
+
+[Service]
+Type=simple
+
+User=worldlinkd
+Group=worldlinkd
+
+WorkingDirectory=/app/wl
+ExecStart=/usr/bin/java -Xms512m -Xmx1024m -jar /app/wl/worldlinkd.jar
+
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
