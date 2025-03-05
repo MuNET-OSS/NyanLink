@@ -72,6 +72,7 @@ tailscale up --advertise-exit-node
 # 7. Configure UFW
 ###############################################################################
 ufw enable
+ufw allow ssh
 ufw allow 20100
 ufw allow 20101
 

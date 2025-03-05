@@ -6,7 +6,8 @@ sudo apt update
 sudo apt install caddy
 
 systemctl enable caddy --now
-ufw allow 80 443
+ufw allow 80
+ufw allow 443
 
 # Ask user to input domain name
 echo "Enter your domain name (e.g. example.com):"
