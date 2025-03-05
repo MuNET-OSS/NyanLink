@@ -55,7 +55,7 @@ jobs:
           draft: false
           prerelease: false
           files: build/libs/worldlinkd.jar
-          token: ${{ secrets.CUSTOM_GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload EXE to Release
         if: runner.os == 'Windows'
