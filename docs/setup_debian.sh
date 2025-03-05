@@ -7,12 +7,12 @@ set -e
 # 1. Basic packages & ZSH setup
 ###############################################################################
 apt-get update
-apt-get install -y git zsh curl util-linux-user
+apt-get install -y git zsh curl
 
 # If you prefer to do zsh setup automatically (like oh-my-zsh or your .zshrc),
 # you can replicate the lines from the original script referencing hydev.org/zshrc
 # For a simple approach, you might do:
-#   curl -sL https://hydev.org/zshrc | bash
+curl -sL https://hydev.org/zshrc | bash
 # But that’s up to you; see your original script comments.
 
 # Change default shell to zsh for the current user
@@ -28,7 +28,9 @@ chsh -s "$(which zsh)"
 #   apt-get update && apt-get -t bookworm-backports install openjdk-21-jdk
 #
 # For many up-to-date Debian 12 systems, though:
-apt-get install -y openjdk-21-jdk ufw ethtool
+apt-get install -y ufw
+wget https://download.oracle.com/java/21/latest/jdk-21_linux-x64_bin.deb
+sudo dpkg -i jdk-21_linux-x64_bin.deb
 
 ###############################################################################
 # 3. Create system user and set up /app/wl
@@ -59,16 +61,10 @@ systemctl enable worldlinkd --now
 # 6. Install Tailscale
 ###############################################################################
 curl -fsSL https://tailscale.com/install.sh | sh
-
-# Bring Tailscale up at least once interactively (might need login)
 tailscale up
-
-# Enable IP forwarding
 echo 'net.ipv4.ip_forward = 1' | tee -a /etc/sysctl.d/99-tailscale.conf
 echo 'net.ipv6.conf.all.forwarding = 1' | tee -a /etc/sysctl.d/99-tailscale.conf
 sysctl -p /etc/sysctl.d/99-tailscale.conf
-
-# (Optional) Advertise as exit node:
 tailscale up --advertise-exit-node
 
 ###############################################################################
@@ -88,19 +84,19 @@ ufw allow 20101
 # Commonly, Debian 12 uses interface names like ens3 or enp1s0. The connection
 # name might differ, or you might not be using "cloud-init ens3". Adjust as needed.
 
-setup_ipv6() {
-    addr="$1"
-    gateway="$2"
-    nmcli connection modify "cloud-init ens3" ipv6.addresses "${addr}/64"
-    nmcli connection modify "cloud-init ens3" ipv6.gateway "$gateway"
-    nmcli connection modify "cloud-init ens3" ipv6.dns "2001:4860:4860::8844 2001:4860:4860::8888"
-    nmcli connection up "cloud-init ens3"
-}
+# setup_ipv6() {
+#     addr="$1"
+#     gateway="$2"
+#     nmcli connection modify "cloud-init ens3" ipv6.addresses "${addr}/64"
+#     nmcli connection modify "cloud-init ens3" ipv6.gateway "$gateway"
+#     nmcli connection modify "cloud-init ens3" ipv6.dns "2001:4860:4860::8844 2001:4860:4860::8888"
+#     nmcli connection up "cloud-init ens3"
+# }
+#
+# echo "Enter your IPv6 address and gateway separated by a space (or leave blank to skip):"
+# read -r addr gateway
+# if [ -n "$addr" ] && [ -n "$gateway" ]; then
+#     setup_ipv6 "$addr" "$gateway"
+# fi
 
-echo "Enter your IPv6 address and gateway separated by a space (or leave blank to skip):"
-read -r addr gateway
-if [ -n "$addr" ] && [ -n "$gateway" ]; then
-    setup_ipv6 "$addr" "$gateway"
-fi
-
-echo "Setup complete!"
+echo "Setup complete! Please manually configure ipv6 https://docs.digitalocean.com/products/networking/ipv6/how-to/enable/#on-existing-droplets"
