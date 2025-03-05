@@ -11,6 +11,7 @@ User=worldlinkd
 Group=worldlinkd
 
 WorkingDirectory=/app/wl
+ExecStartPre=/app/wl/update.sh
 ExecStart=/usr/bin/java -Xms512m -Xmx1024m -jar /app/wl/worldlinkd.jar
 
 Restart=on-failure
