@@ -13,6 +13,7 @@ apt-get install -y git zsh curl
 # you can replicate the lines from the original script referencing hydev.org/zshrc
 # For a simple approach, you might do:
 curl -sL https://hydev.org/zshrc | bash
+python3 ~/zshrc/scripts/bin/update-ssh-keys.py
 # But that’s up to you; see your original script comments.
 
 # Change default shell to zsh for the current user
