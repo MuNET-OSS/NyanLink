@@ -372,7 +372,9 @@ MigrationBackup/
 
 Output
 .idea
-Libs/Assembly-CSharp.dll
+Assembly-CSharp.dll
+Assembly-CSharp-firstpass.dll
+AMDaemon.NET.dll
 packages
 .DS_Store
 ._*
