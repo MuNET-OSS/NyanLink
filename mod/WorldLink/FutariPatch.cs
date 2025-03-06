@@ -58,7 +58,7 @@ public static class Futari
         if (StartUpStateType == null) Log.Error("StartUpStateType not found");
         
         // Send HTTP request to get the futari client address
-        // client = new FutariClient("A1234567890", , 20101);
+        client = new FutariClient("A1234567890", "", 20101);
         $"{FutariClient.LOBBY_BASE}/info".GetAsync((sender, e) =>
         {
             if (e.Error != null)
@@ -68,7 +68,8 @@ public static class Futari
             }
             // Response Format: {"relayHost": "google.com", "relayPort": 20101}
             var info = JsonUtility.FromJson<ServerInfo>(e.Result);
-            client = new FutariClient("A1234567890", info.relayHost, info.relayPort);
+            client.host = info.relayHost;
+            client.port = info.relayPort;
             Log.Info($"WorldLink server address: {info.relayHost}:{info.relayPort}");
         });
     }
@@ -96,8 +97,8 @@ public static class Futari
         // Wait until the client is initialized
         new System.Threading.Thread(() =>
         {
-            while (client == null && !stopping) Thread.Sleep(100);
-            if (client == null) return;
+            while (client.host == "" && !stopping) Thread.Sleep(100);
+            if (client.host == "") return;
             client.keychip = keychip;
             client.ConnectAsync();
             isInit = true;

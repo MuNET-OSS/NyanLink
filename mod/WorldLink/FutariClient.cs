@@ -57,8 +57,9 @@ public class FutariClient
     private readonly long[] _delayWindow = new int[20].Select(_ => -1L).ToArray();
     public int _delayIndex = 0;
     public long _delayAvg = 0;
-    private readonly string host;
-    private readonly int port;
+    
+    public string host { get; set; }
+    public int port { get; set; }
 
     public IPAddress StubIP => FutariExt.KeychipToStubIp(keychip).ToIP();
 
