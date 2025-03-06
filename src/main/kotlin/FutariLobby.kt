@@ -1,5 +1,6 @@
 package aquadx
 
+import com.alibaba.fastjson2.parseObject
 import com.alibaba.fastjson2.toJSONString
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -70,7 +71,12 @@ fun Application.configureRouting() = routing {
     get("/recruit/list") {
         val time = millis()
         recruits.filterValues { time - it.Time > MAX_TTL }.keys.forEach { recruits.remove(it) }
-        call.respondText(recruits.values.toList().joinToString("\n") { KJson.encodeToString(it) })
+        call.respondText(recruits.values.toList().joinToString("\n") { obj ->
+            KJson.encodeToString(obj).parseObject().apply {
+                this.remove("Keychip")
+                this.remove("Time")
+            }.toJSONString()
+        })
     }
 
     get("/info") {
