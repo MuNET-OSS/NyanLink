@@ -131,6 +131,7 @@ class FutariRelay(private val port: Int = 20101) {
         while (true) {
             val clientSocket = serverSocket.accept().apply {
                 soTimeout = SO_TIMEOUT
+                tcpNoDelay = true
                 log.info("[+] Client connected: $remoteSocketAddress")
             }
             thread { handleClient(clientSocket) }
