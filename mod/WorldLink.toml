@@ -1,0 +1,18 @@
+
+# WorldLink configuration file
+# 
+# The Lobby URL can be one of {asia, euro, usw, use, cn}.link.aquadx.net
+# Please select one that is closest to your location.
+#
+# - asia: East Asia (Singapore)
+# - euro: Europe (Amsterdam)
+# - usw: US West (San Francisco)
+# - use: US East (Toronto)
+# - cn: China (Beijing)
+#
+# NOTE: If you're playing with your friend, make sure you both use the same Lobby URL.
+LobbyUrl="https://euro.link.aquadx.net"
+
+# Show debug messages
+Debug=false
+
