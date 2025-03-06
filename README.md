@@ -1,42 +1,34 @@
-# worldlinkd
+# WorldLink
 
-This project was created using the [Ktor Project Generator](https://start.ktor.io).
+WorldLink maimai DX Online C2C Multiplayer Mod
 
-Here are some useful links to get you started:
+> ![WARNING]
+> This mod is in beta testing, please report any bugs you find.
 
-- [Ktor Documentation](https://ktor.io/docs/home.html)
-- [Ktor GitHub page](https://github.com/ktorio/ktor)
-- The [Ktor Slack chat](https://app.slack.com/client/T09229ZC6/C0A974TJ9). You'll need
-  to [request an invite](https://surveys.jetbrains.com/s3/kotlin-slack-sign-up) to join.
+## Playing WorldLink
 
-## Features
+### On PC & Controller
 
-Here's a list of features included in this project:
+1. Install [MelonLoader](https://github.com/LavaGang/MelonLoader#install)
+2. Download [WorldLink.dll](https://github.com/MewoLab/worldlinkd/releases/latest/download/WorldLink.dll), put it in Mods
+3. Download [WorldLink.toml](https://github.com/MewoLab/worldlinkd/blob/main/mod/WorldLink.toml)
+4. Edit `WorldLink.toml` to select a lobby server
+5. Start the game
 
-| Name                                                                   | Description                                                                        |
-| ------------------------------------------------------------------------|------------------------------------------------------------------------------------ |
-| [Routing](https://start.ktor.io/p/routing)                             | Provides a structured routing DSL                                                  |
-| [Content Negotiation](https://start.ktor.io/p/content-negotiation)     | Provides automatic content conversion according to Content-Type and Accept headers |
-| [kotlinx.serialization](https://start.ktor.io/p/kotlinx-serialization) | Handles JSON serialization using kotlinx.serialization library                     |
+### On KanadeDX
 
-## Building & Running
+1. Go to launcher settings in the top right
+2. Click on the "mods" tab
+3. Scroll down to find WorldLink, enable it
+4. Fill in the WorldLink URL
+5. Start the game
 
-To build or run the project, use one of the following tasks:
+## Play Manual
 
-| Task                          | Description                                                          |
-| -------------------------------|---------------------------------------------------------------------- |
-| `./gradlew test`              | Run the tests                                                        |
-| `./gradlew build`             | Build everything                                                     |
-| `buildFatJar`                 | Build an executable JAR of the server with all dependencies included |
-| `buildImage`                  | Build the docker image to use with the fat JAR                       |
-| `publishImageToLocalRegistry` | Publish the docker image locally                                     |
-| `run`                         | Run the server                                                       |
-| `runDocker`                   | Run using the local docker image                                     |
+1. You and your friend both connect to the same lobby
+2. One person select a song and difficulty, scroll to the left, and click recruit
+3. The other person join in the song-select menu
 
-If the server starts successfully, you'll see the following output:
+## Running a Server
 
-```
-2024-12-04 14:32:45.584 [main] INFO  Application - Application started in 0.303 seconds.
-2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
-```
-
+If you want to self-host a server to play with your friends, read the [Self Host Guide](README.HOST.md).
