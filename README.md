@@ -2,7 +2,7 @@
 
 WorldLink maimai DX Online C2C Multiplayer Mod
 
-> ![WARNING]
+> [!WARNING]
 > This mod is in beta testing, please report any bugs you find.
 
 ## Playing WorldLink
