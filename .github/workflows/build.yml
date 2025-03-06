@@ -74,6 +74,7 @@ jobs:
           files: |
             build/libs/worldlinkd.jar
             mod/bin/Release/net472/WorldLink.dll
+            mod/WorldLink.toml
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload EXE to Release
