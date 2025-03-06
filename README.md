@@ -5,7 +5,7 @@ WorldLink maimai DX Online C2C Multiplayer Mod
 > [!WARNING]
 > This mod is in beta testing, please report any bugs you find.
 
-## Playing WorldLink
+## Setting Up WorldLink
 
 ### On PC & Controller
 
@@ -23,7 +23,7 @@ WorldLink maimai DX Online C2C Multiplayer Mod
 4. Fill in the WorldLink URL
 5. Start the game
 
-## Play Manual
+## How to Play
 
 1. You and your friend both connect to the same lobby
 2. One person select a song and difficulty, scroll to the left, and click recruit
