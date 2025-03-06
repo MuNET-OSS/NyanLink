@@ -10,9 +10,24 @@
 4. Run `java -jar worldlinkd.jar`  
   (if you installed other java versions before, make sure this java command points to Java 21)
 
-## Option 2: Using Docker
+## Option 2: Using Docker Compose
 
 1. Install [Docker](https://docs.docker.com/get-docker/)
 2. Clone / download this repository
 3. Open command prompt in this folder
 4. Run `docker compose up`
+
+## Option 3: Using Docker Run
+
+1. Install [Docker](https://docs.docker.com/get-docker/)
+2. Run `docker run -d --name worldlinkd --restart unless-stopped -p 20100:20100 -p 20101:20101 aquadx/worldlinkd`
+
+## Setting Up Reverse Proxy
+
+If you want HTTPS, you can use a reverse proxy like Caddy. Below is an example Caddyfile:
+
+```caddy
+worldlinkd.example.com {
+  reverse_proxy localhost:20100
+}
+```
