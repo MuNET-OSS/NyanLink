@@ -23,6 +23,7 @@ public class Core : MelonMod
         Config = TomletMain.To<Config>(File.ReadAllText("WorldLink.toml"));
      
         LoggerInstance.Msg("Patching...");
+        Futari.OnBeforePatch();
         HarmonyLib.Harmony.CreateAndPatchAll(typeof(Futari));
         
         if (Config.Debug)
