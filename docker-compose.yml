@@ -1,8 +1,9 @@
 services:
   worldlinkd:
-    build: .
+#    build: .
+    image: aquadx/worldlinkd
     ports:
       - "20100:20100"
       - "20101:20101"
-    restart: always
+    restart: unless-stopped
     container_name: worldlinkd

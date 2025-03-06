@@ -8,7 +8,6 @@
 # - euro: Europe (Amsterdam)
 # - usw: US West (San Francisco)
 # - use: US East (Toronto)
-# - cn: China (Beijing)
 #
 # NOTE: If you're playing with your friend, make sure you both use the same Lobby URL.
 LobbyUrl="https://euro.link.aquadx.net"
