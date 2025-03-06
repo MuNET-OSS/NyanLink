@@ -14,6 +14,23 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
+      - name: Setup .NET 8.x
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.x'
+
+      - uses: actions/checkout@v4
+        with:
+          repository: 'MewoLab/AquaMai-Build-Assets'
+          path: "AquaMai-Build-Assets"
+          token: ${{ secrets.PATGH }}
+
+      - name: Copy Libs
+        run: cp AquaMai-Build-Assets/WorldLinkLibs/* mod/Libs/
+
+      - name: Build .NET Mod
+        run: cd mod && dotnet build -c Release
+
       - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
@@ -54,7 +71,9 @@ jobs:
           body: "CI Build Release"
           draft: false
           prerelease: false
-          files: build/libs/worldlinkd.jar
+          files: |
+            build/libs/worldlinkd.jar
+            mod/bin/Release/net472/WorldLink.dll
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload EXE to Release
