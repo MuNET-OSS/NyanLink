@@ -1,0 +1,8 @@
+services:
+  worldlinkd:
+    build: .
+    ports:
+      - "20100:20100"
+      - "20101:20101"
+    restart: always
+    container_name: worldlinkd
