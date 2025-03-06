@@ -34,6 +34,7 @@ public static class Futari
     
     private static readonly Dictionary<NFSocket, FutariSocket> redirect = new();
     private static FutariClient client;
+    private static bool checkAuthCalled = false;
     private static bool isInit = false;
     public static bool stopping = false;
 
@@ -78,6 +79,10 @@ public static class Futari
     [HarmonyPatch(typeof(OperationManager), "CheckAuth_Proc")]
     public static bool CheckAuth_Proc()
     {
+        // Prevent multiple calls
+        if (checkAuthCalled) return PrefixRet.RUN_ORIGINAL;
+        checkAuthCalled = true;
+        
         if (isInit) return PrefixRet.RUN_ORIGINAL;
         Log.Info("CheckAuth_Proc");
 
