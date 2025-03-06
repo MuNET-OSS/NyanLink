@@ -2,8 +2,10 @@
 
 WorldLink maimai DX Online C2C Multiplayer Mod
 
+<img width="613" alt="image" src="https://github.com/user-attachments/assets/bd53ab9d-49f8-46ac-b51b-9a5de00ef7e1" />
+
 > [!WARNING]
-> This mod is in beta testing, please report any bugs you find.
+> This mod is in public testing, please report any bugs you find.
 
 ## Setting Up WorldLink
 
