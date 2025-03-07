@@ -79,9 +79,11 @@ fun Application.configureRouting() = routing {
         })
     }
 
+    val hostOverride = System.getenv("HOST_OVERRIDE")
+
     get("/info") {
         mapOf(
-            "relayHost" to call.request.local.serverHost,
+            "relayHost" to (hostOverride ?: call.request.local.serverHost),
             "relayPort" to 20101
         ).ok()
     }
