@@ -1,14 +1,7 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import type { MusicInfo, Server } from './types'
-
-  const srvs = [
-    'use', 'usw', 'asia', 'euro'
-  ]
-  const names = [
-    "US East", "US West", "Asia", "Europe", "China"
-  ]
-  const urls = srvs.map(v => `${v}.link.aquadx.net`)
+  import {urls, names} from './srv.local'
 
   let lst: Server[] = []
 
@@ -20,7 +13,7 @@
       allMusic = data
       console.log(allMusic)
     })
-    const res = await Promise.all(urls.map(url => fetch(`https://corsproxy.io/?url=https://${url}/recruit/list`)))
+    const res = await Promise.all(urls.map(url => fetch(`${url}/recruit/list`)))
     const data = await Promise.all(res.map(r => r.text()))
     const json = data.map(d => 
       d.split('\n').filter(v => v.length > 0).map(v => JSON.parse(v).RecruitInfo)
@@ -36,8 +29,7 @@
       })
     })
 
-    lst = srvs.map((v, i) => ({
-      code: v,
+    lst = urls.map((v, i) => ({
       name: names[i],
       url: urls[i],
       data: json[i]
@@ -61,7 +53,7 @@
     <div class="server">
       <div class="srv-info">
         <h2>{srv.name}</h2>
-        <span>{srv.url} - {srv.data.length} rooms</span>
+        <span>{srv.url.replace('https://', '').replace('http://', '')} - {srv.data.length} rooms</span>
       </div>
 
       <div class="rooms">

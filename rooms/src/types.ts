@@ -7,7 +7,6 @@ export interface MusicInfo {
 }
 
 export interface Server {
-    code: string
     name: string
     url: string
     data: RecruitInfo[]
