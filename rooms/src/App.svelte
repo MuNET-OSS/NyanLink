@@ -19,10 +19,17 @@
   // allMusic: map< str musicid : music info >
   let allMusic: Record<string, MusicInfo> = {}
 
-  async function getData() {
+  async function getMusic() {
     fetch("https://aquadx.net/d/mai2/00/all-music.json").then(res => res.json()).then(data => {
       allMusic = data
     })
+  }
+
+  async function getData() {
+    if (Object.keys(allMusic).length === 0) {
+      await getMusic()
+    }
+
     const res = await Promise.all(urls.map(url => fetch(`${url}/recruit/list`)))
     const data = await Promise.all(res.map(r => r.text()))
     const json = data.map(d => 
