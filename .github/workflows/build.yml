@@ -14,6 +14,28 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Build frontend for deployment
+        run: |
+          cd rooms
+          bun install
+          VITE_WL_BUILD_PROD=true bun run build
+
+      - name: Upload pages build
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: rooms/dist
+
+      - name: Build frontend for embedding
+        run: |
+          cd rooms
+          bun run build
+          cp dist/combined.html ../src/main/resources/
+
       - name: Setup .NET 8.x
         uses: actions/setup-dotnet@v4
         with:
@@ -42,26 +64,6 @@ jobs:
 
       - name: Build fat JAR
         run: ./gradlew clean buildFatJar
-        # Or if you are using Shadow plugin:
-        # run: ./gradlew clean shadowJar
-
-      # Example jpackage step:
-      - name: Build Windows .exe with jpackage
-        # jpackage is available by default in the Java 17 distribution on Ubuntu,
-        # but note you need to specify --type exe on Windows. On Ubuntu, you can cross-compile
-        # for Windows using the --win-* flags only if you have the right cross-toolchain set up. 
-        # Typically, you'd run this step on Windows if you want an actual .exe.
-        # For demonstration, here's how you'd do it on a Windows runner:
-        if: runner.os == 'Windows'
-        run: |
-          jpackage \
-            --type exe \
-            --name "WorldLinkD" \
-            --input .\build\libs \
-            --main-jar "worldlinkd.jar" \
-            --main-class "aquadx.ApplicationKt" \
-            --java-options "-Xmx512m" \
-            --win-console
 
       - name: Release
         uses: softprops/action-gh-release@v2
@@ -76,12 +78,3 @@ jobs:
             mod/bin/Release/net472/WorldLink.dll
             mod/WorldLink.toml
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Upload EXE to Release
-        if: runner.os == 'Windows'
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: "WorldLinkD-1.0.exe"        # adjust if different output file
-          asset_name: "WorldLinkD-installer.exe" # or any naming convention you want
-          asset_content_type: application/octet-stream
