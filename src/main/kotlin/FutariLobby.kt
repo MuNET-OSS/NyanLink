@@ -2,7 +2,9 @@ package aquadx
 
 import com.alibaba.fastjson2.parseObject
 import com.alibaba.fastjson2.toJSONString
+import io.ktor.http.*
 import io.ktor.server.application.*
+import io.ktor.server.http.content.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
@@ -35,6 +37,7 @@ val writer: BufferedWriter = FileOutputStream(File("recruit.log"), true).buffere
 val mutex = Mutex()
 
 fun Application.configureRouting() = routing {
+    val html = resStr("/combined.html")  ?: "<html><body>Running!</body></html>"
     val log = logger()
 
     suspend fun log(data: String) = mutex.withLock {
@@ -47,8 +50,12 @@ fun Application.configureRouting() = routing {
     suspend fun log(data: RecruitRecord, msg: String) =
         log("${LocalDateTime.now().isoDateTime()}: $msg: ${KJson.encodeToString(data)}")
 
+    val hostOverride = System.getenv("HOST_OVERRIDE")
+
     get("/") {
-        call.respondText("Running!")
+        val l = call.request.local
+        val resp = html.replace("REPLACE URL HERE qwq", (hostOverride ?: "${l.scheme}://${l.serverHost}:${l.serverPort}"))
+        call.respondText(resp, ContentType.Text.Html)
     }
 
     post("/recruit/start") {
@@ -78,8 +85,6 @@ fun Application.configureRouting() = routing {
             }.toJSONString()
         })
     }
-
-    val hostOverride = System.getenv("HOST_OVERRIDE")
 
     get("/info") {
         mapOf(
