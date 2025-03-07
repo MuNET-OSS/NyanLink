@@ -2,6 +2,9 @@
 
 `worldlinkd` is the daemon or server component of WorldLink. The below guide will help you self host a server to play with your friend.
 
+> [!WARNING]
+> This mod does not support ipv6 yet, please use ipv4.
+
 ## Option 1: Run Natively
 
 1. Install [Java 21](https://download.oracle.com/java/21/archive/jdk-21.0.5_windows-x64_bin.exe)
