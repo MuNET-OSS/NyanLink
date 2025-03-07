@@ -10,7 +10,7 @@
     urls = ['https://use.link.aquadx.net', 'https://usw.link.aquadx.net', 'https://asia.link.aquadx.net', 'https://euro.link.aquadx.net']
     names = ["US East", "US West", "Asia", "Europe"]
   } else {
-    urls = ['REPLACE URL HERE qwq']
+    urls = ['']
     names = ['Local Server']
   }
 

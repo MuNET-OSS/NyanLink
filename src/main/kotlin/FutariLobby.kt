@@ -37,8 +37,8 @@ val writer: BufferedWriter = FileOutputStream(File("recruit.log"), true).buffere
 val mutex = Mutex()
 
 fun Application.configureRouting() = routing {
-    val html = resStr("/combined.html")  ?: "<html><body>Running!</body></html>"
     val log = logger()
+    val hostOverride = System.getenv("HOST_OVERRIDE")
 
     suspend fun log(data: String) = mutex.withLock {
         log.info(data)
@@ -50,13 +50,7 @@ fun Application.configureRouting() = routing {
     suspend fun log(data: RecruitRecord, msg: String) =
         log("${LocalDateTime.now().isoDateTime()}: $msg: ${KJson.encodeToString(data)}")
 
-    val hostOverride = System.getenv("HOST_OVERRIDE")
-
-    get("/") {
-        val l = call.request.local
-        val resp = html.replace("REPLACE URL HERE qwq", (hostOverride ?: "${l.scheme}://${l.serverHost}:${l.serverPort}"))
-        call.respondText(resp, ContentType.Text.Html)
-    }
+    staticResources("/", "dist")
 
     post("/recruit/start") {
         val d = call.receive<RecruitRecord>().apply { Time = millis() }

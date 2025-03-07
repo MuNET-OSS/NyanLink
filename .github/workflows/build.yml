@@ -18,22 +18,19 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Build frontend for deployment
+      - name: Build frontend
         run: |
           cd rooms
           bun install
+          bun run build
+          cp -r dist ../src/main/resources/
+          rm -rf dist
           VITE_WL_BUILD_PROD=true bun run build
 
       - name: Upload pages build
         uses: actions/upload-pages-artifact@v3
         with:
           path: rooms/dist
-
-      - name: Build frontend for embedding
-        run: |
-          cd rooms
-          bun run build
-          cp dist/combined.html ../src/main/resources/
 
       - name: Setup .NET 8.x
         uses: actions/setup-dotnet@v4
