@@ -129,6 +129,7 @@ namespace HarmonyLib
         public const string BRIGHT_CYAN = "";
         public const string BRIGHT_WHITE = "";
         public const string RESET = "";
+        public const string PREFIX = "[FUTARI] ";
 #else
         // Text colors
         public const string BLACK = "\u001b[30m";
@@ -152,6 +153,7 @@ namespace HarmonyLib
 
         // Reset
         public const string RESET = "\u001b[0m";
+        public const string PREFIX = "";
 #endif
 
         // Remove all non-printable characters
@@ -162,7 +164,7 @@ namespace HarmonyLib
         {
             lock (_lock)
             {
-                MelonLogger.Error($"[FUTARI] {RED}ERROR {RESET}{msg.Norm()}{RESET}");
+                MelonLogger.Error($"{PREFIX}{RED}ERROR {RESET}{msg.Norm()}{RESET}");
             }
         }
 
@@ -170,7 +172,7 @@ namespace HarmonyLib
         {
             lock (_lock)
             {
-                MelonLogger.Warning($"[FUTARI] {YELLOW}WARN  {RESET}{msg.Norm()}{RESET}");
+                MelonLogger.Warning($"{PREFIX}{YELLOW}WARN  {RESET}{msg.Norm()}{RESET}");
             }
         }
 
@@ -179,7 +181,7 @@ namespace HarmonyLib
             if (!Futari.Debug) return;
             lock (_lock)
             {
-                MelonLogger.Msg($"[FUTARI] {CYAN}DEBUG {RESET}{msg.Norm()}{RESET}");
+                MelonLogger.Msg($"{PREFIX}{CYAN}DEBUG {RESET}{msg.Norm()}{RESET}");
             }
         }
 
@@ -189,7 +191,7 @@ namespace HarmonyLib
             {
                 if (msg.StartsWith("A001")) msg = MAGENTA + msg;
                 if (msg.StartsWith("A002")) msg = CYAN + msg;
-                MelonLogger.Msg($"[FUTARI] {GREEN}INFO  {RESET}{msg.Norm()}{RESET}");
+                MelonLogger.Msg($"{PREFIX}{GREEN}INFO  {RESET}{msg.Norm()}{RESET}");
             }
         }
     }
