@@ -90,6 +90,10 @@
     }))
     console.log(lst)
   })
+
+  function imgError(e: any) {
+    e.target.src = "https://aquadx.net/assets/imgs/no_cover.jpg"
+  }
 </script>
 
 <main>
@@ -105,7 +109,7 @@
       <div class="rooms">
         {#each srv.data as info}
           <div class="room level-{info.MechaInfo.FumenDifs[0]}">
-            <img src="https://aquadx.net/d/mai2/music/00{info.MusicID % 10000}.png">
+            <img src="https://aquadx.net/d/mai2/music/00{info.MusicID % 10000}.png" on:error={imgError}>
 
             <div class="info">
               <div class="song">
@@ -159,7 +163,7 @@
   .rooms
     display: flex
     flex-wrap: wrap
-    gap: 10px
+    gap: 20px
     justify-content: center
 
   .no-rooms
