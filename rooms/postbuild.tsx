@@ -10,6 +10,10 @@ async function inlineAssets() {
 
   let html = await readFile(path.join(DIST_DIR, 'index.html'), 'utf8');
 
+  // Remove all <script> with src tags and <link rel="stylesheet"> tags
+  html = html.replace(/<script type="module" crossorigin src=".*"><\/script>/g, '');
+  html = html.replace(/<link rel="stylesheet" crossorigin href=".*">/g, '');
+
   // Inline CSS
   for (const cssFile of cssFiles) {
     const cssContent = await readFile(path.join(ASSETS_DIR, cssFile), 'utf8');
