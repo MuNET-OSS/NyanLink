@@ -1,7 +1,18 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import type { MusicInfo, Server } from './types'
-  import {urls, names} from './srv.local'
+
+  var urls: string[]
+  var names: string[]
+
+  // console.log(`Prod: ${import.meta.env.VITE_WL_BUILD_PROD}`)
+  if (import.meta.env.VITE_WL_BUILD_PROD === 'true') {
+    urls = ['https://use.link.aquadx.net', 'https://usw.link.aquadx.net', 'https://asia.link.aquadx.net', 'https://euro.link.aquadx.net']
+    names = ["US East", "US West", "Asia", "Europe"]
+  } else {
+    urls = ['REPLACE URL HERE qwq']
+    names = ['Local Server']
+  }
 
   let lst: Server[] = []
 
@@ -11,7 +22,6 @@
   async function getData() {
     fetch("https://aquadx.net/d/mai2/00/all-music.json").then(res => res.json()).then(data => {
       allMusic = data
-      console.log(allMusic)
     })
     const res = await Promise.all(urls.map(url => fetch(`${url}/recruit/list`)))
     const data = await Promise.all(res.map(r => r.text()))
@@ -34,7 +44,6 @@
       url: urls[i],
       data: json[i]
     }))
-    console.log(lst)
   }
   onMount(getData)
   

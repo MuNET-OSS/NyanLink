@@ -1,2 +1,0 @@
-export const urls = ['https://use.link.aquadx.net', 'https://usw.link.aquadx.net', 'https://asia.link.aquadx.net', 'https://euro.link.aquadx.net']
-export const names = ["US East", "US West", "Asia", "Europe"]
