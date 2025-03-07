@@ -6,6 +6,7 @@ import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.cors.routing.*
 import io.ktor.server.plugins.statuspages.*
 import io.ktor.server.response.*
 
@@ -22,6 +23,9 @@ fun Application.module() {
         exception<ApiException> { call, cause ->
             call.respond(HttpStatusCode.fromValue(cause.code), cause.message ?: "Something went wrong")
         }
+    }
+    install(CORS) {
+        anyHost()
     }
     configureRouting()
 }
