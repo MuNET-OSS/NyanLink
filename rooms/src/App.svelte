@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import { onMount } from 'svelte'
+  import type { MusicInfo, Server } from './types'
 
   const srvs = [
     'use', 'usw', 'asia', 'euro'
@@ -14,54 +15,7 @@
   // allMusic: map< str musicid : music info >
   let allMusic: Record<string, MusicInfo> = {}
 
-  interface MusicInfo {
-    name: string,
-    composer: string,
-    notes: {
-      lv: number,
-    }[]
-  }
-
-  interface Server {
-    code: string;
-    name: string;
-    url: string;
-    data: RecruitInfo[];
-  }
-
-  interface RecruitInfo {
-    MechaInfo: {
-      IsJoin: boolean;
-      IpAddress: number;
-      MusicID: number;
-      Entrys: boolean[];
-      UserIDs: number[];
-      UserNames: string[];
-      IconIDs: number[];
-      FumenDifs: number[];
-      Rateing: number[];
-      ClassValue: number[];
-      MaxClassValue: number[];
-      UserType: number[];
-    };
-    MusicID: number;
-    GroupID: number;
-    EventModeID: boolean;
-    JoinNumber: number;
-    PartyStance: number;
-    _startTimeTicks: number;
-    _recvTimeTicks: number;
-
-    music?: MusicInfo;
-    users: RecruitUser[];
-  }
-
-  interface RecruitUser {
-    name: string
-    rating: number
-  }
-
-  onMount(async () => {
+  async function getData() {
     fetch("https://aquadx.net/d/mai2/00/all-music.json").then(res => res.json()).then(data => {
       allMusic = data
       console.log(allMusic)
@@ -89,7 +43,11 @@
       data: json[i]
     }))
     console.log(lst)
-  })
+  }
+  onMount(getData)
+  
+  // Refresh every 5s
+  setInterval(getData, 5000)
 
   function imgError(e: any) {
     e.target.src = "https://aquadx.net/assets/imgs/no_cover.jpg"
