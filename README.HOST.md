@@ -39,7 +39,7 @@ Make sure you check you can open this url in your phone browser before trying to
 
 ## Setting Up Reverse Proxy
 
-If you want HTTPS (e.g. `https://{your-domain}`) you can use a reverse proxy like Caddy. Below is an example Caddyfile:
+If you want HTTPS (e.g. `https://{your-domain}`) you can use a reverse proxy like Caddy. Make sure you have a domain first. Below is an example Caddyfile:
 
 ```caddy
 worldlinkd.example.com {
