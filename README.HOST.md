@@ -25,6 +25,18 @@
 1. Install [Docker](https://docs.docker.com/get-docker/)
 2. Run `docker run -d --name worldlinkd --restart unless-stopped -p 20100:20100 -p 20101:20101 aquadx/worldlinkd`
 
+## Connecting
+
+Use the url `http://{your-ip}:20100` to connect.
+
+Make sure you check you can open this url in your phone browser before trying to connect in game. If it can't open, check each of the following:
+
+1. Windows Firewall isn't blocking port 20100 & 20101 (try turning it off).
+2. The IP you entered is correct (don't just get any ip from your ipconfig, it should be your WiFi ip, it should most likely start with 192.168. or 10.0. or 100.)
+3. The IP is ipv4 (sadly the game doesn't support ipv6 yet).
+4. Your router isn't blocking LAN connections.
+5. If you want to use public ip instead of LAN ip, make sure you setup port forward on your router.
+
 ## Setting Up Reverse Proxy
 
 If you want HTTPS, you can use a reverse proxy like Caddy. Below is an example Caddyfile:
@@ -34,3 +46,4 @@ worldlinkd.example.com {
   reverse_proxy localhost:20100
 }
 ```
+
