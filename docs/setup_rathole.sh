@@ -62,12 +62,14 @@ AmbientCapabilities=CAP_NET_BIND_SERVICE
 WantedBy=multi-user.target
 EOF
 
-# Generate a len-64 random string for the token
-token=$(head -c 64 /dev/urandom | base64 | tr -d '\n')
-echo "Generated token: $token"
-
-# Write the config file
-cat <<EOF > /app/rathole/aquadx.toml
+# If the config doesn't exist, generate a new one
+if [ ! -f /app/rathole/aquadx.toml ]; then
+    # Generate a len-64 random string for the token
+    token=$(head -c 64 /dev/urandom | base64 | tr -d '\n')
+    echo "Generated token: $token"
+    
+    # Write the config file
+    cat <<EOF > /app/rathole/aquadx.toml
 [server]
 bind_addr = "0.0.0.0:18199"
 default_token = "$token"
@@ -81,16 +83,20 @@ bind_addr = "0.0.0.0:8443"
 [server.services.aimedb]
 bind_addr = "0.0.0.0:22345"
 EOF
+fi
 
 # Reload systemd to apply the new service
 sudo systemctl daemon-reload
-sudo systemctl enable rathole@aquadx --now
+sudo systemctl enable ratholes@aquadx --now
+sudo systemctl restart ratholes@aquadx
 
 # Add to caddyfile if the "# Managed by setup_rathole.sh script" line is found
 if grep -q "# Managed by setup_rathole.sh script" /etc/caddy/Caddyfile; then
     cat <<EOF >> /etc/caddy/Caddyfile
+# Managed by setup_rathole.sh script
 http:// {
     reverse_proxy  localhost:8092
 }
+# !Managed
 EOF
 
