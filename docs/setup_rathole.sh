@@ -90,8 +90,8 @@ sudo systemctl daemon-reload
 sudo systemctl enable ratholes@aquadx --now
 sudo systemctl restart ratholes@aquadx
 
-# Add to caddyfile if the "# Managed by setup_rathole.sh script" line is found
-if grep -q "# Managed by setup_rathole.sh script" /etc/caddy/Caddyfile; then
+# Add to caddyfile if the "# Managed by setup_rathole.sh script" line is not found
+if ! grep -q "# Managed by setup_rathole.sh script" /etc/caddy/Caddyfile; then
     cat <<EOF >> /etc/caddy/Caddyfile
 # Managed by setup_rathole.sh script
 http:// {
