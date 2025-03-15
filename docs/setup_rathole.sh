@@ -24,6 +24,7 @@ fi
 
 # Download binary
 wget "https://github.com/rapiz1/rathole/releases/latest/download/rathole-x86_64-unknown-linux-gnu.zip" -O rathole.zip
+rm -rf rathole
 unzip rathole.zip
 rm rathole.zip
 
@@ -67,7 +68,7 @@ if [ ! -f /app/rathole/aquadx.toml ]; then
     # Generate a len-64 random string for the token
     token=$(head -c 64 /dev/urandom | base64 | tr -d '\n')
     echo "Generated token: $token"
-    
+
     # Write the config file
     cat <<EOF > /app/rathole/aquadx.toml
 [server]
