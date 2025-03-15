@@ -95,7 +95,9 @@ if ! grep -q "# Managed by setup_rathole.sh script" /etc/caddy/Caddyfile; then
     cat <<EOF >> /etc/caddy/Caddyfile
 # Managed by setup_rathole.sh script
 http:// {
-    reverse_proxy  localhost:8092
+    reverse_proxy  localhost:8092 {
+        header_up AllNet-Forwarded-From "euro.prox.aquadx.net"
+    }
 }
 # !Managed
 EOF
