@@ -112,3 +112,5 @@ http:// {
 EOF
 fi
 
+sudo systemctl reload caddy
+
