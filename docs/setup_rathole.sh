@@ -113,4 +113,7 @@ EOF
 fi
 
 sudo systemctl reload caddy
+ufw allow 22345
+ufw allow 8443
+
 
