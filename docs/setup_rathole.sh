@@ -24,8 +24,7 @@ fi
 
 # Download binary
 wget "https://github.com/rapiz1/rathole/releases/latest/download/rathole-x86_64-unknown-linux-gnu.zip" -O rathole.zip
-rm -rf rathole
-unzip rathole.zip
+unzip -o rathole.zip
 rm rathole.zip
 
 # Add systemd service
