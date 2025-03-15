@@ -90,13 +90,22 @@ sudo systemctl daemon-reload
 sudo systemctl enable ratholes@aquadx --now
 sudo systemctl restart ratholes@aquadx
 
+# Ask the user to input the localhost
+echo "Please input the host that the rathole server is running on (e.g. euro.prox.aquadx.net):"
+read -r host
+# Check if the host is empty
+if [ -z "$host" ]; then
+    echo "Host cannot be empty"
+    exit 1
+fi
+
 # Add to caddyfile if the "# Managed by setup_rathole.sh script" line is not found
 if ! grep -q "# Managed by setup_rathole.sh script" /etc/caddy/Caddyfile; then
     cat <<EOF >> /etc/caddy/Caddyfile
 # Managed by setup_rathole.sh script
 http:// {
     reverse_proxy  localhost:8092 {
-        header_up AllNet-Forwarded-From "euro.prox.aquadx.net"
+        header_up AllNet-Forwarded-From "$host"
     }
 }
 # !Managed
