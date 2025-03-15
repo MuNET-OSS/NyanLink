@@ -11,11 +11,17 @@ ufw allow 443
 
 # Ask user to input domain name
 echo "Enter your domain name (e.g. example.com):"
+read -r domain
+# Ensure the domain name is not empty
+if [ -z "$domain" ]; then
+    echo "Domain name cannot be empty."
+    exit 1
+fi
 
 # Create Caddyfile
 echo "Creating Caddyfile..."
 cat <<EOF > /etc/caddy/Caddyfile
-${1} {
+${domain} {
     reverse_proxy localhost:20100
 }
 EOF
