@@ -106,6 +106,7 @@ if ! grep -q "# Managed by setup_rathole.sh script" /etc/caddy/Caddyfile; then
 http:// {
     reverse_proxy  localhost:8092 {
         header_up AllNet-Forwarded-From "$host"
+        header_up CF-Connecting-IP {remote_host}
     }
 }
 # !Managed
