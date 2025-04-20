@@ -87,12 +87,8 @@ public static class Futari
         if (isInit) return PrefixRet.RUN_ORIGINAL;
         Log.Info("CheckAuth_Proc");
 
-        var keychip = AMDaemon.System.KeychipId.ShortValue;
-        Log.Info($"Keychip ID: {keychip}");
-        if (string.IsNullOrEmpty(keychip)) Log.Error("Keychip ID is empty. WorldLink will not work.");
-        
         // Randomize keychip
-        keychip = "W9" + new System.Random().Next(100000000, 999999999);
+        var keychip = "W9" + new System.Random().Next(100000000, 999999999);
 
         // Wait until the client is initialized
         new System.Threading.Thread(() =>
