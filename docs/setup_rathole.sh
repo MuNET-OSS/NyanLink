@@ -77,9 +77,6 @@ default_token = "$token"
 [server.services.allnet]
 bind_addr = "127.0.0.1:8092"
 
-[server.services.billing]
-bind_addr = "0.0.0.0:8443"
-
 [server.services.aimedb]
 bind_addr = "0.0.0.0:22345"
 EOF
@@ -115,6 +112,6 @@ fi
 
 sudo systemctl reload caddy
 ufw allow 22345
-ufw allow 8443
+ufw allow 18199
 
 
