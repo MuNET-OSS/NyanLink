@@ -42,6 +42,10 @@ public static class Futari
     private static MethodBase packetWriteUInt;
     private static System.Type StartUpStateType;
 
+    // Thread management
+    private static System.Threading.Thread onlineUserCountThread;
+    private static System.Threading.Thread recruitListThread;
+
     [ConfigEntry(hideWhenDefault: true)]
     public static bool Debug = false;
 
@@ -100,11 +104,14 @@ public static class Futari
             client.ConnectAsync();
             isInit = true;
             
+            // Wait a bit for game systems to fully initialize
+            Thread.Sleep(2000);
+            
             // Fetch initial online user count
             FetchOnlineUserCount();
             
-            // Start periodic online user count fetching
-            30000.Interval(() => FetchOnlineUserCount());
+            // Start periodic online user count fetching with proper thread management
+            onlineUserCountThread = 30000.Interval(() => FetchOnlineUserCount(), name: "OnlineUserCountThread");
         }).Start();
 
         return PrefixRet.RUN_ORIGINAL;
@@ -127,11 +134,29 @@ public static class Futari
     // Fetch online user count from server
     private static void FetchOnlineUserCount()
     {
+        if (stopping) return; // Don't fetch if we're shutting down
+        
         try
         {
+            // Check if the lobby URL is available
+            if (string.IsNullOrEmpty(FutariClient.LOBBY_BASE))
+            {
+                Log.Debug("Lobby URL not available yet, skipping online user count fetch");
+                return;
+            }
+            
             var response = $"{FutariClient.LOBBY_BASE}/online".Get();
+            if (string.IsNullOrEmpty(response))
+            {
+                Log.Debug("Empty response from online endpoint");
+                return;
+            }
+            
             var onlineInfo = JsonUtility.FromJson<OnlineUserInfo>(response);
-            onlineUserCount = onlineInfo.totalUsers;
+            if (onlineInfo != null)
+            {
+                onlineUserCount = onlineInfo.totalUsers;
+            }
         }
         catch (Exception ex)
         {
@@ -165,12 +190,12 @@ public static class Futari
                 var recruitCount = PartyMan == null ? 0 : PartyMan.GetRecruitList().Count;
                 if (onlineUserCount > 0)
                 {
-                    ____buildVersionText.text = $"WorldLink Recruiting: {recruitCount}/{onlineUserCount}";
+                    ____buildVersionText.text = $"[WL] Room:{recruitCount} | Online:{onlineUserCount}";
                     ____buildVersionText.color = recruitCount > 0 ? Color.green : Color.cyan;
                 }
                 else if (onlineUserCount == 0)
                 {
-                    ____buildVersionText.text = $"No players online";
+                    ____buildVersionText.text = $"[WL] Online:0";
                     ____buildVersionText.color = Color.gray;
                 }
                 else
@@ -263,26 +288,81 @@ public static class Futari
     public static void postClientConstruct(Client __instance, string name, PartyLink.Party.InitParam initParam)
     {
         Log.Debug($"new Client({name}, {initParam})");
-        10000.Interval(() => 
-            lastRecruits = $"{FutariClient.LOBBY_BASE}/recruit/list"
-                .Get().Trim().Split('\n')
-                .Where(x => !string.IsNullOrEmpty(x))
-                .Select(JsonUtility.FromJson<RecruitRecord>).ToList()
-                .Also(lst => lst
-                    .Select(x => x.RecruitInfo.Identity())
-                    .Do(ids => lastRecruits.Keys
-                        .Where(key => !ids.Contains(key))
-                        .Each(key => RFinishRecruit.Invoke(__instance, new[]{new Packet(lastRecruits[key].IpAddress)
-                            .Also(p => p.encode(new FinishRecruit(lastRecruits[key])))
-                        }))
-                    )
-                )
-                .Each(x => RStartRecruit.Invoke(__instance, new[]{new Packet(x.RecruitInfo.IpAddress)
-                    .Also(p => p.encode(new StartRecruit(x.RecruitInfo)))
-                }))
-                .Select(x => x.RecruitInfo)
-                .ToDictionary(x => x.Identity())
-        );
+        recruitListThread = 10000.Interval(() => 
+        {
+            if (stopping) return; // Don't process if we're shutting down
+            
+            try
+            {
+                // Add null checks to prevent crashes
+                if (__instance == null || lastRecruits == null)
+                {
+                    Log.Debug("Client or lastRecruits is null, skipping recruit list update");
+                    return;
+                }
+                
+                var response = $"{FutariClient.LOBBY_BASE}/recruit/list".Get();
+                if (string.IsNullOrEmpty(response))
+                {
+                    Log.Debug("Empty response from recruit list endpoint");
+                    return;
+                }
+                
+                var recruitRecords = response.Trim().Split('\n')
+                    .Where(x => !string.IsNullOrEmpty(x))
+                    .Select(JsonUtility.FromJson<RecruitRecord>)
+                    .Where(x => x != null && x.RecruitInfo != null) // Filter out null records
+                    .ToList();
+                
+                // Process finished recruits
+                var currentIds = recruitRecords.Select(x => x.RecruitInfo.Identity()).ToList();
+                var finishedRecruits = lastRecruits.Keys.Where(key => !currentIds.Contains(key)).ToList();
+                
+                foreach (var key in finishedRecruits)
+                {
+                    try
+                    {
+                        if (lastRecruits.ContainsKey(key) && lastRecruits[key] != null)
+                        {
+                            var packet = new Packet(lastRecruits[key].IpAddress);
+                            packet.encode(new FinishRecruit(lastRecruits[key]));
+                            RFinishRecruit?.Invoke(__instance, new object[] { packet });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error($"Error processing finished recruit {key}: {ex.Message}");
+                    }
+                }
+                
+                // Process new recruits
+                foreach (var record in recruitRecords)
+                {
+                    try
+                    {
+                        if (record.RecruitInfo != null)
+                        {
+                            var packet = new Packet(record.RecruitInfo.IpAddress);
+                            packet.encode(new StartRecruit(record.RecruitInfo));
+                            RStartRecruit?.Invoke(__instance, new object[] { packet });
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        Log.Error($"Error processing new recruit: {ex.Message}");
+                    }
+                }
+                
+                // Update lastRecruits dictionary
+                lastRecruits = recruitRecords
+                    .Where(x => x.RecruitInfo != null)
+                    .ToDictionary(x => x.RecruitInfo.Identity(), x => x.RecruitInfo);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Error in recruit list update: {ex.Message}");
+            }
+        }, name: "RecruitListThread");
     }
     
     // Block start recruit if the song is not available
