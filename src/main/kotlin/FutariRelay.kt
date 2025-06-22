@@ -158,6 +158,7 @@ class FutariRelay(private val port: Int = 20101) {
                         clients[client.stubIp] = client
                         handler = clients[client.stubIp]
                         log.info("[+] Client registered: ${socket.remoteSocketAddress} -> $id")
+                        log.info("[=] Online now: ${clients.size}")
 
                         // Send back the version
                         handler?.send(ctlMsg(Command.CTL_START, "version=$PROTO_VERSION"))
@@ -177,6 +178,7 @@ class FutariRelay(private val port: Int = 20101) {
             handler?.stubIp?.let { clients.remove(it) }
             socket.close()
             log.info("[-] Client disconnected: ${handler?.clientKey}")
+            log.info("[=] Online now: ${clients.size}")
         }
     }
 }
