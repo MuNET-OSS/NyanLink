@@ -41,6 +41,12 @@ public class ServerInfo
     public int relayPort;
 }
 
+public class OnlineUserInfo
+{
+    public int totalUsers;
+    public int activeRecruits;
+}
+
 public struct FutariMsg
 {
     public FutariCmd FutariCmd;

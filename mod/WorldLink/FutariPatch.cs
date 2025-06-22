@@ -37,6 +37,7 @@ public static class Futari
     private static bool checkAuthCalled = false;
     private static bool isInit = false;
     public static bool stopping = false;
+    private static int onlineUserCount = 0;
 
     private static MethodBase packetWriteUInt;
     private static System.Type StartUpStateType;
@@ -98,6 +99,12 @@ public static class Futari
             client.keychip = keychip;
             client.ConnectAsync();
             isInit = true;
+            
+            // Fetch initial online user count
+            FetchOnlineUserCount();
+            
+            // Start periodic online user count fetching
+            30000.Interval(() => FetchOnlineUserCount());
         }).Start();
 
         return PrefixRet.RUN_ORIGINAL;
@@ -116,6 +123,23 @@ public static class Futari
         return false;
     }
 #endif
+
+    // Fetch online user count from server
+    private static void FetchOnlineUserCount()
+    {
+        try
+        {
+            var response = $"{FutariClient.LOBBY_BASE}/online".Get();
+            var onlineInfo = JsonUtility.FromJson<OnlineUserInfo>(response);
+            onlineUserCount = onlineInfo.totalUsers;
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"Failed to fetch online user count: {ex.Message}");
+            onlineUserCount = 0;
+        }
+    }
+
     //Online Display
     [HarmonyPostfix]
     [HarmonyPatch(typeof(CommonMonitor), "ViewUpdate")]
@@ -138,8 +162,22 @@ public static class Futari
                 ____buildVersionText.color = Color.yellow;
                 break;
             case 2:
-                ____buildVersionText.color = Color.cyan;
-                ____buildVersionText.text = PartyMan == null ? $"WorldLink Waiting" : $"WorldLink Recruiting: {PartyMan.GetRecruitList().Count}";
+                var recruitCount = PartyMan == null ? 0 : PartyMan.GetRecruitList().Count;
+                if (onlineUserCount > 0)
+                {
+                    ____buildVersionText.text = $"WorldLink Recruiting: {recruitCount}/{onlineUserCount}";
+                    ____buildVersionText.color = recruitCount > 0 ? Color.green : Color.cyan;
+                }
+                else if (onlineUserCount == 0)
+                {
+                    ____buildVersionText.text = $"No players online";
+                    ____buildVersionText.color = Color.gray;
+                }
+                else
+                {
+                    ____buildVersionText.text = $"WorldLink Recruiting: {recruitCount}";
+                    ____buildVersionText.color = Color.cyan;
+                }
                 break;
         }
     }

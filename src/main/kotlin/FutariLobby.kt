@@ -87,6 +87,23 @@ fun Application.configureRouting() = routing {
         ).ok()
     }
 
+    get("/online") {
+        val time = millis()
+        // Clean up expired recruits
+        recruits.filterValues { time - it.Time > MAX_TTL }.keys.forEach { recruits.remove(it) }
+        
+        // Count actual connected clients from FutariRelay
+        val totalUsers = clients.size
+        
+        // Count active recruits (unique users)
+        val activeRecruits = recruits.size
+        
+        OnlineUserInfo(
+            totalUsers = totalUsers,
+            activeRecruits = activeRecruits
+        ).ok()
+    }
+
     get("/debug") {
         mapOf(
             "serverHost" to call.request.local.serverHost,

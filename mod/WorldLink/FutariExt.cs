@@ -47,7 +47,8 @@ public static class FutariExt
     
     public static V? Get<K, V>(this ConcurrentDictionary<K, V> dict, K key) where V : class
     {
-        return dict.GetValueOrDefault(key);
+        dict.TryGetValue(key, out V value);
+        return value;
     }
     
     // Call a function using reflection

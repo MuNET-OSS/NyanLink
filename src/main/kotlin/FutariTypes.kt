@@ -96,3 +96,9 @@ data class RelayServerInfo(
     val port: Int = 20101,
     val official: Bool = true
 )
+
+@Serializable
+data class OnlineUserInfo(
+    val totalUsers: Int,
+    val activeRecruits: Int
+)
