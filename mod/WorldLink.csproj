@@ -6,12 +6,12 @@
 		<RootNamespace>WorldLink</RootNamespace>
 		<LangVersion>default</LangVersion>
 		<IsPackable>false</IsPackable>
-		<AssemblyVersion>1.0.0.0</AssemblyVersion>
-		<FileVersion>1.0.0.0</FileVersion>
 		<NeutralLanguage>en-US</NeutralLanguage>
 		<AssemblyName>WorldLink</AssemblyName>
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -246,26 +246,10 @@
 		<Reference Include="0Harmony">
 			<HintPath>Libs\0Harmony.dll</HintPath>
 		</Reference>
-
-	</ItemGroup>
-
-	<PropertyGroup>
-		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
-		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-	</PropertyGroup>
-
-	<ItemGroup>
-		<Compile Include="BuildInfo.cs" />
-		<Compile Include="Compat.cs" />
-		<Compile Include="Core.cs" />
-		<Compile Include="WorldLink\FutariClient.cs" />
-		<Compile Include="WorldLink\FutariExt.cs" />
-		<Compile Include="WorldLink\FutariPatch.cs" />
-		<Compile Include="WorldLink\FutariSocket.cs" />
-		<Compile Include="WorldLink\FutariTypes.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Include=".config\dotnet-tools.json" />
+		<None Remove="Libs/**" />
+		<None Remove="tools/**" />
 	</ItemGroup>
 </Project>

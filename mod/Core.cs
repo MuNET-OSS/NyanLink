@@ -1,9 +1,6 @@
 ﻿using MelonLoader;
 using Tomlet;
 
-[assembly: MelonInfo(typeof(WorldLink.Core), "WorldLink", "1.0.0", "Azalea")]
-[assembly: MelonGame("sega-interactive", "Sinmai")]
-
 namespace WorldLink;
 
 public class Config
@@ -19,17 +16,6 @@ public class Core : MelonMod
     
     public override void OnInitializeMelon()
     {
-        LoggerInstance.Msg("""
-/=============================\
-|  .  .      .  ..       .    |
-|  |  | _ ._.| _||   *._ ;_/  |
-|  |/\|(_)[  |(_]|___|[ )| \  |
-\=============================/
-  |      Version 1.0.0      |
-  |   Made with <3 by Aza   |
-  \=========================/
-""");
-        
         // Load config
         LoggerInstance.Msg("Loading config...");
         Config = TomletMain.To<Config>(File.ReadAllText("WorldLink.toml"));
