@@ -16,9 +16,8 @@ using static Manager.Accounting;
 
 public class FutariClient
 {
-    public static string LOBBY_BASE => AquaMai.ReadString("Mods.WorldLink.LobbyUrl");
-    public static string RELAY_BASE => AquaMai.ReadString("Mods.WorldLink.RelayUrl");
-    // public const string LOBBY_BASE = "https://aquadx.net/aqua/mai2-futari";
+    public static string LOBBY_BASE => WorldLink.Core.Config.LobbyUrl;
+    public static string RELAY_BASE => WorldLink.Core.Config.RelayUrl;
     public static FutariClient Instance { get; private set; }
 
     public FutariClient(string keychip, string host, int port, int _)

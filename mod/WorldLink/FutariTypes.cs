@@ -193,6 +193,7 @@ namespace HarmonyLib
 
         public static void Info(string msg)
         {
+            if (!Futari.Debug) return;
             lock (_lock)
             {
                 if (msg.StartsWith("A001")) msg = MAGENTA + msg;

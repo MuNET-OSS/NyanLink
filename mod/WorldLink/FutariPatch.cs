@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
@@ -22,16 +19,12 @@ using MelonLoader.TinyJSON;
 using System.Threading;
 #endif
 
-[ConfigSection(
-    en: "Enable NyaLink Multiplayer",
-    zh: "启用 NyaLink 多人游戏",
-    defaultOn: false)]
 public static class Futari
 {
 #if UNITY_2018_1_OR_NEWER
     public static bool Enabled => AquaMai.Enabled("Mods.WorldLink");
 #endif
-    
+
     private static readonly Dictionary<NFSocket, FutariSocket> redirect = new();
     private static FutariClient client;
     private static bool checkAuthCalled = false;
@@ -46,25 +39,25 @@ public static class Futari
     private static System.Threading.Thread onlineUserCountThread;
     private static System.Threading.Thread recruitListThread;
 
-    [ConfigEntry(hideWhenDefault: true)]
     public static bool Debug = false;
 
     #region Init
+
     private static readonly MethodInfo SetRecruitData = typeof(MusicSelectProcess).GetProperty("RecruitData")!.SetMethod;
     public static void OnBeforePatch()
     {
-        Log.Info("Starting NyaLink patch...");
+        Log.Info("Starting NyanLink patch...");
 
         packetWriteUInt = typeof(Packet).GetMethod("write_uint", BindingFlags.NonPublic | BindingFlags.Static, null,
-            new[]{typeof(PacketType), typeof(int), typeof(uint)}, null);
+            new[] { typeof(PacketType), typeof(int), typeof(uint) }, null);
         if (packetWriteUInt == null) Log.Error("write_uint not found");
 
         StartUpStateType = typeof(StartupProcess).GetField("_state", BindingFlags.NonPublic | BindingFlags.Instance)!.FieldType;
         if (StartUpStateType == null) Log.Error("StartUpStateType not found");
-        
+
         // Send HTTP request to get the futari client address
         client = new FutariClient("A1234567890", "", 20101);
-        
+
         // Check if RelayUrl is configured
         if (!string.IsNullOrEmpty(FutariClient.RELAY_BASE))
         {
@@ -100,7 +93,7 @@ public static class Futari
         // Prevent multiple calls
         if (checkAuthCalled) return PrefixRet.RUN_ORIGINAL;
         checkAuthCalled = true;
-        
+
         if (isInit) return PrefixRet.RUN_ORIGINAL;
         Log.Info("CheckAuth_Proc");
 
@@ -115,13 +108,13 @@ public static class Futari
             client.keychip = keychip;
             client.ConnectAsync();
             isInit = true;
-            
+
             // Wait a bit for game systems to fully initialize
             Thread.Sleep(2000);
-            
+
             // Fetch initial online user count
             FetchOnlineUserCount();
-            
+
             // Start periodic online user count fetching with proper thread management
             onlineUserCountThread = 30000.Interval(() => FetchOnlineUserCount(), name: "OnlineUserCountThread");
         }).Start();
@@ -132,6 +125,7 @@ public static class Futari
     #endregion
 
     #region Misc
+
     //Force Enable LanAvailable
 #if !UNITY_2018_1_OR_NEWER
     [HarmonyPrefix]
@@ -147,7 +141,7 @@ public static class Futari
     private static void FetchOnlineUserCount()
     {
         if (stopping) return; // Don't fetch if we're shutting down
-        
+
         try
         {
             // Check if the lobby URL is available
@@ -156,14 +150,14 @@ public static class Futari
                 Log.Debug("Lobby URL not available yet, skipping online user count fetch");
                 return;
             }
-            
+
             var response = $"{FutariClient.LOBBY_BASE}/online".Get();
             if (string.IsNullOrEmpty(response))
             {
                 Log.Debug("Empty response from online endpoint");
                 return;
             }
-            
+
             var onlineInfo = JsonUtility.FromJson<OnlineUserInfo>(response);
             if (onlineInfo != null)
             {
@@ -180,40 +174,35 @@ public static class Futari
     //Online Display
     [HarmonyPostfix]
     [HarmonyPatch(typeof(CommonMonitor), "ViewUpdate")]
-    public static void CommonMonitorViewUpdate(CommonMonitor __instance,TextMeshProUGUI ____buildVersionText, GameObject ____developmentBuildText)
+    public static void CommonMonitorViewUpdate(CommonMonitor __instance, TextMeshProUGUI ____buildVersionText, GameObject ____developmentBuildText)
     {
         ____buildVersionText.transform.position = ____developmentBuildText.transform.position;
         ____buildVersionText.gameObject.SetActive(true);
         switch (client.StatusCode)
         {
             case -1:
-                ____buildVersionText.text = $"NyaLink Offline";
+                ____buildVersionText.text = $"NyanLink Offline";
                 ____buildVersionText.color = Color.red;
                 break;
             case 0:
-                ____buildVersionText.text = $"NyaLink Disconnect";
+                ____buildVersionText.text = $"NyanLink Disconnect";
                 ____buildVersionText.color = Color.gray;
                 break;
             case 1:
-                ____buildVersionText.text = $"NyaLink Connecting";
+                ____buildVersionText.text = $"NyanLink Connecting";
                 ____buildVersionText.color = Color.yellow;
                 break;
             case 2:
                 var recruitCount = PartyMan == null ? 0 : PartyMan.GetRecruitList().Count;
                 if (onlineUserCount > 0)
                 {
-                    ____buildVersionText.text = $"[NL] Room:{recruitCount} | Online:{onlineUserCount}";
-                    ____buildVersionText.color = recruitCount > 0 ? Color.green : Color.cyan;
+                    ____buildVersionText.text = $"NyanLink Room: {recruitCount} Online: {onlineUserCount}";
+                    ____buildVersionText.color = new Color(172 / 256f, 181 / 256f, 250 / 256f);
                 }
                 else if (onlineUserCount == 0)
                 {
-                    ____buildVersionText.text = $"[NL] Online:0";
+                    ____buildVersionText.text = $"NyanLink Online: 0";
                     ____buildVersionText.color = Color.gray;
-                }
-                else
-                {
-                    ____buildVersionText.text = $"NyaLink Recruiting: {recruitCount}";
-                    ____buildVersionText.color = Color.cyan;
                 }
                 break;
         }
@@ -229,19 +218,20 @@ public static class Futari
             // Block AdvocateDelivery, SettingHostAddress
             case AdvocateDelivery or Setting.SettingHostAddress:
                 return PrefixRet.BLOCK_ORIGINAL;
-           
+
             // If it's a Start/FinishRecruit message, send it using http instead
             case StartRecruit or FinishRecruit:
-                var inf = info is StartRecruit o ? o.RecruitInfo : ((FinishRecruit) info).RecruitInfo;
+                var inf = info is StartRecruit o ? o.RecruitInfo : ((FinishRecruit)info).RecruitInfo;
                 var start = info is StartRecruit ? "start" : "finish";
-                var msg = JsonUtility.ToJson(new RecruitRecord {
+                var msg = JsonUtility.ToJson(new RecruitRecord
+                {
                     Keychip = client.keychip,
                     RecruitInfo = inf
                 }, false);
                 $"{FutariClient.LOBBY_BASE}/recruit/{start}".PostAsync(msg);
                 Log.Info($"Sent {start} recruit message: {msg}");
                 return PrefixRet.BLOCK_ORIGINAL;
-            
+
             // Log the actual type of info and the actual type of this class
             default:
                 Log.Debug($"SendClass: {Log.BRIGHT_RED}{info.GetType().Name}{Log.RESET} from {__instance.GetType().Name}");
@@ -282,9 +272,9 @@ public static class Futari
     }
 
     #endregion
-    
+
     #region Recruit Information
-    
+
     private static readonly MethodInfo RStartRecruit = typeof(Client)
         .GetMethod("RecvStartRecruit", BindingFlags.NonPublic | BindingFlags.Instance);
     private static readonly MethodInfo RFinishRecruit = typeof(Client)
@@ -292,7 +282,7 @@ public static class Futari
     private static Dictionary<string, RecruitInfo> lastRecruits = new();
 
     private static string Identity(this RecruitInfo x) => $"{x.IpAddress} : {x.MusicID}";
-    
+
     // Client Constructor
     // Client:: public Client(string name, PartyLink.Party.InitParam initParam)
     [HarmonyPostfix]
@@ -300,10 +290,10 @@ public static class Futari
     public static void postClientConstruct(Client __instance, string name, PartyLink.Party.InitParam initParam)
     {
         Log.Debug($"new Client({name}, {initParam})");
-        recruitListThread = 10000.Interval(() => 
+        recruitListThread = 10000.Interval(() =>
         {
             if (stopping) return; // Don't process if we're shutting down
-            
+
             try
             {
                 // Add null checks to prevent crashes
@@ -312,24 +302,24 @@ public static class Futari
                     Log.Debug("Client or lastRecruits is null, skipping recruit list update");
                     return;
                 }
-                
+
                 var response = $"{FutariClient.LOBBY_BASE}/recruit/list".Get();
                 if (string.IsNullOrEmpty(response))
                 {
                     Log.Debug("Empty response from recruit list endpoint");
                     return;
                 }
-                
+
                 var recruitRecords = response.Trim().Split('\n')
                     .Where(x => !string.IsNullOrEmpty(x))
                     .Select(JsonUtility.FromJson<RecruitRecord>)
                     .Where(x => x != null && x.RecruitInfo != null) // Filter out null records
                     .ToList();
-                
+
                 // Process finished recruits
                 var currentIds = recruitRecords.Select(x => x.RecruitInfo.Identity()).ToList();
                 var finishedRecruits = lastRecruits.Keys.Where(key => !currentIds.Contains(key)).ToList();
-                
+
                 foreach (var key in finishedRecruits)
                 {
                     try
@@ -346,7 +336,7 @@ public static class Futari
                         Log.Error($"Error processing finished recruit {key}: {ex.Message}");
                     }
                 }
-                
+
                 // Process new recruits
                 foreach (var record in recruitRecords)
                 {
@@ -364,7 +354,7 @@ public static class Futari
                         Log.Error($"Error processing new recruit: {ex.Message}");
                     }
                 }
-                
+
                 // Update lastRecruits dictionary
                 lastRecruits = recruitRecords
                     .Where(x => x.RecruitInfo != null)
@@ -376,7 +366,7 @@ public static class Futari
             }
         }, name: "RecruitListThread");
     }
-    
+
     // Block start recruit if the song is not available
     // Client:: private void RecvStartRecruit(Packet packet)
     [HarmonyPrefix]
@@ -394,7 +384,7 @@ public static class Futari
         }
         return PrefixRet.RUN_ORIGINAL;
     }
-    
+
     #endregion
 
     private static IManager PartyMan => Manager.Party.Party.Party.Get();
@@ -405,7 +395,7 @@ public static class Futari
     public static void postStartupOnUpdate(ref byte ____state, string[] ____statusMsg, string[] ____statusSubMsg)
     {
         // Status code
-        ____statusMsg[7] = "NYALINK";
+        ____statusMsg[7] = "NyanLink";
         ____statusSubMsg[7] = client.StatusCode switch
         {
             -1 => "BAD",
@@ -435,12 +425,13 @@ public static class Futari
     }
 
     #region NFSocket
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(NFSocket), MethodType.Constructor, typeof(AddressFamily), typeof(SocketType), typeof(ProtocolType), typeof(int))]
     public static void postNFCreate(NFSocket __instance, AddressFamily addressFamily, SocketType socketType, ProtocolType protocolType, int mockID)
     {
         Log.Debug($"new NFSocket({addressFamily}, {socketType}, {protocolType}, {mockID})");
-        if (mockID == 3939) return;  // Created in redirected NFAccept as a stub
+        if (mockID == 3939) return; // Created in redirected NFAccept as a stub
         var futari = new FutariSocket(addressFamily, socketType, protocolType, mockID);
         redirect.Add(__instance, futari);
     }
@@ -575,6 +566,7 @@ public static class Futari
         __result = redirect[__instance].LocalEndPoint;
         return PrefixRet.BLOCK_ORIGINAL;
     }
+
     #endregion
 
     #region Packet codec
@@ -587,7 +579,7 @@ public static class Futari
         ____encrypt.ClearAndResize(____plane.Count);
         Array.Copy(____plane.GetBuffer(), 0, ____encrypt.GetBuffer(), 0, ____plane.Count);
         ____encrypt.ChangeCount(____plane.Count);
-        packetWriteUInt.Invoke(null, new Object[]{____plane, 0, (uint)____plane.Count});
+        packetWriteUInt.Invoke(null, new Object[] { ____plane, 0, (uint)____plane.Count });
         return PrefixRet.BLOCK_ORIGINAL;
     }
 
@@ -599,12 +591,12 @@ public static class Futari
         ____plane.ClearAndResize(____encrypt.Count);
         Array.Copy(____encrypt.GetBuffer(), 0, ____plane.GetBuffer(), 0, ____encrypt.Count);
         ____plane.ChangeCount(____encrypt.Count);
-        packetWriteUInt.Invoke(null, new Object[]{____plane, 0, (uint)____plane.Count});
+        packetWriteUInt.Invoke(null, new Object[] { ____plane, 0, (uint)____plane.Count });
         return PrefixRet.BLOCK_ORIGINAL;
     }
 
     #endregion
-    
+
     #region Recruit UI
 
     private static int musicIdSum;
@@ -636,19 +628,19 @@ public static class Futari
         {
             // 设置房间信息显示
             var info = __instance.RecruitData.MechaInfo;
-            var players = "NyaLink Room! Players: " + 
-                          string.Join(" and ", info.UserNames.Where((_, i) => info.FumenDifs[i] != -1));
-            
+            var players = "NyanLink Room! Players: " +
+                string.Join(" and ", info.UserNames.Where((_, i) => info.FumenDifs[i] != -1));
+
             __instance.MonitorArray.Where((_, i) => __instance.IsEntry(i))
                 .Each(x => x.SetSideMessage(players));
-            
+
             sideMessageFlag = true;
         }
-        else if(!__instance.IsConnectionFolder() && sideMessageFlag)
+        else if (!__instance.IsConnectionFolder() && sideMessageFlag)
         {
             __instance.MonitorArray.Where((_, i) => __instance.IsEntry(i))
                 .Each(x => x.SetSideMessage(CommonMessageID.Scroll_Music_Select.GetName()));
-            
+
             sideMessageFlag = false;
         }
     }
@@ -659,7 +651,7 @@ public static class Futari
     {
         // 开歌时设置当前选择的联机数据
         if (!__instance.IsConnectionFolder() || __result == null) return;
-        
+
         var list = PartyMan.GetRecruitListWithoutMe();
         if (list == null) return;
         if (__instance.CurrentMusicSelect >= 0 && __instance.CurrentMusicSelect < list.Count)
@@ -670,13 +662,14 @@ public static class Futari
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(MusicSelectProcess), "IsConnectStart")]
-    public static bool preIsConnectStart(MusicSelectProcess __instance,
+    public static bool preIsConnectStart(
+        MusicSelectProcess __instance,
         List<CombineMusicSelectData> ____connectCombineMusicDataList,
         SubSequence[] ____currentPlayerSubSequence,
         ref bool __result)
     {
         __result = false;
-        
+
         // 修正 SetConnectData 触发条件，阻止原有 IP 判断重新设置
         var recruits = PartyMan.GetRecruitListWithoutMe();
         if (!__instance.IsConnectingMusic && recruits.Count > 0)
@@ -690,12 +683,13 @@ public static class Futari
         }
         return PrefixRet.BLOCK_ORIGINAL;
     }
-    
+
     public static readonly MethodInfo SetConnectCategoryEnable = typeof(MusicSelectProcess).GetProperty("IsConnectCategoryEnable")!.SetMethod;
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(MusicSelectProcess), "SetConnectData")]
-    public static bool preSetConnectData(MusicSelectProcess __instance,
+    public static bool preSetConnectData(
+        MusicSelectProcess __instance,
         List<CombineMusicSelectData> ____connectCombineMusicDataList,
         SubSequence[] ____currentPlayerSubSequence)
     {
@@ -719,7 +713,7 @@ public static class Futari
                     combineMusicSelectData.existDeluxeScore = true;
                     break;
             }
-            
+
             for (var i = 0; i < 2; i++)
             {
                 combineMusicSelectData.musicSelectData.Add(new MusicSelectData(music, notesList, 0));
@@ -731,16 +725,18 @@ public static class Futari
                 for (var j = 0; j < __instance.MonitorArray.Length; j++)
                 {
                     if (!__instance.IsEntry(j)) continue;
-                    
+
                     __instance.MonitorArray[j].SetRecruitInfo(thumbnailName);
                     SoundManager.PlaySE(Cue.SE_INFO_NORMAL, j);
                 }
             }
-            catch { /* 防止有可能的空 */ }
-            
+            catch
+            { /* 防止有可能的空 */
+            }
+
             __instance.IsConnectingMusic = true;
         }
-        
+
         // No data available, add a dummy entry
         if (PartyMan.GetRecruitListWithoutMe().Count == 0)
         {
@@ -751,120 +747,23 @@ public static class Futari
             });
             __instance.IsConnectingMusic = false;
         }
-        
+
         if (__instance.MonitorArray == null) return PrefixRet.BLOCK_ORIGINAL;
-        
+
         for (var l = 0; l < __instance.MonitorArray.Length; l++)
         {
             if (____currentPlayerSubSequence[l] != SubSequence.Music) continue;
-            
+
             __instance.MonitorArray[l].SetDeployList(false);
             if (!__instance.IsConnectionFolder(0)) continue;
-            
+
             __instance.ChangeBGM();
             if (!__instance.IsEntry(l)) continue;
-            
+
             __instance.MonitorArray[l].SetVisibleButton(__instance.IsConnectingMusic, InputManager.ButtonSetting.Button04);
         }
         return PrefixRet.BLOCK_ORIGINAL;
     }
-    #endregion
-    
-    #region Debug
-
-#if !UNITY_2018_1_OR_NEWER
-    [EnableIf(typeof(Futari), nameof(Debug))]
-    public class FutariDebug
-    {
-        // Log ListenSocket creation
-        // ListenSocket:: public ListenSocket(string name, int mockID)
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(ListenSocket), MethodType.Constructor, typeof(string), typeof(int))]
-        public static void ListenSocket(ListenSocket __instance, string name, int mockID)
-        {
-            Log.Debug($"new ListenSocket({name}, {mockID})");
-        }
-
-        // Log ListenSocket open
-        // ListenSocket:: public bool open(ushort portNumber)
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(ListenSocket), "open", typeof(ushort))]
-        public static bool open(ListenSocket __instance, ushort portNumber)
-        {
-            Log.Debug($"ListenSocket.open({portNumber}) - {__instance}");
-            return PrefixRet.RUN_ORIGINAL;
-        }
-
-        // Log packet type
-        // Analyzer:: private void procPacketData(Packet packet)
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(Analyzer), "procPacketData", typeof(Packet))]
-        public static bool procPacketData(Packet packet, Dictionary<Command, object> ____commandMap)
-        {
-            var keys = string.Join(", ", ____commandMap.Keys);
-            Log.Debug($"procPacketData: {Log.BRIGHT_RED}{packet.getCommand()}{Log.RESET} in {keys}");
-            return PrefixRet.RUN_ORIGINAL;
-        }
-
-        // Log host creation
-        // Host:: public Host(string name)
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(Host), MethodType.Constructor, typeof(string))]
-        public static void Host(Host __instance, string name)
-        {
-            Log.Debug($"new Host({name})");
-        }
-
-        // Log host state change
-        // Host:: private void SetCurrentStateID(PartyPartyHostStateID nextState)
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(Host), "SetCurrentStateID", typeof(PartyPartyHostStateID))]
-        public static bool SetCurrentStateID(PartyPartyHostStateID nextState)
-        {
-            Log.Debug($"Host::SetCurrentStateID: {nextState}");
-            return PrefixRet.RUN_ORIGINAL;
-        }
-
-        // Log Member creation
-        // Member:: public Member(string name, Host host, NFSocket socket)
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(Member), MethodType.Constructor, typeof(string), typeof(Host), typeof(NFSocket))]
-        public static void Member(Member __instance, string name, Host host, NFSocket socket)
-        {
-            Log.Debug($"new Member({name}, {host}, {socket})");
-        }
-
-        // Log Member state change
-        // Member:: public void SetCurrentStateID(PartyPartyClientStateID state)
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(Member), "SetCurrentStateID", typeof(PartyPartyClientStateID))]
-        public static bool SetCurrentStateID(PartyPartyClientStateID state)
-        {
-            Log.Debug($"Member::SetCurrentStateID: {state}");
-            return PrefixRet.RUN_ORIGINAL;
-        }
-
-        // Log Member RecvRequestJoin
-        // Member:: private void RecvRequestJoin(Packet packet)
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(Member), "RecvRequestJoin", typeof(Packet))]
-        public static bool RecvRequestJoin(Packet packet)
-        {
-            Log.Debug($"Member::RecvRequestJoin: {packet.getParam<RequestJoin>()}");
-            return PrefixRet.RUN_ORIGINAL;
-        }
-
-        // Log Member RecvClientState
-        // Member:: private void RecvClientState(Packet packet)
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(Member), "RecvClientState", typeof(Packet))]
-        public static bool RecvClientState(Packet packet)
-        {
-            Log.Debug($"Member::RecvClientState: {packet.getParam<ClientState>()}");
-            return PrefixRet.RUN_ORIGINAL;
-        }
-    }
-#endif
 
     #endregion
 
@@ -875,14 +774,14 @@ public static class Futari
         {
             if (e.Error != null)
             {
-                Log.Error($"Failed to get NyaLink server address: {e.Error}");
+                Log.Error($"Failed to get NyanLink server address: {e.Error}");
                 return;
             }
             // Response Format: {"relayHost": "google.com", "relayPort": 20101}
             var info = JsonUtility.FromJson<ServerInfo>(e.Result);
             client.host = info.relayHost;
             client.port = info.relayPort;
-            Log.Info($"NyaLink server address: {info.relayHost}:{info.relayPort}");
+            Log.Info($"NyanLink server address: {info.relayHost}:{info.relayPort}");
         });
     }
 }

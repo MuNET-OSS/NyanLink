@@ -9,27 +9,20 @@ public class Config
     public string RelayUrl { get; set; }
     public bool Debug { get; set; }
 }
-
 public class Core : MelonMod
 {
     public static Config Config;
-    
+
     public override void OnInitializeMelon()
     {
         // Load config
         LoggerInstance.Msg("Loading config...");
         Config = TomletMain.To<Config>(File.ReadAllText("WorldLink.toml"));
-     
+
         LoggerInstance.Msg("Patching...");
         Futari.OnBeforePatch();
         HarmonyLib.Harmony.CreateAndPatchAll(typeof(Futari));
-        
-        if (Config.Debug)
-        {
-            LoggerInstance.Msg("Patching debug...");
-            HarmonyLib.Harmony.CreateAndPatchAll(typeof(Futari.FutariDebug));
-        }
-        
+
         LoggerInstance.Msg("Initialized.");
     }
 }
