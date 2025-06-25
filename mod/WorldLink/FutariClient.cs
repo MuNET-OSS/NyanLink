@@ -17,6 +17,7 @@ using static Manager.Accounting;
 public class FutariClient
 {
     public static string LOBBY_BASE => AquaMai.ReadString("Mods.WorldLink.LobbyUrl");
+    public static string RELAY_BASE => AquaMai.ReadString("Mods.WorldLink.RelayUrl");
     // public const string LOBBY_BASE = "https://aquadx.net/aqua/mai2-futari";
     public static FutariClient Instance { get; private set; }
 
@@ -165,6 +166,23 @@ public class FutariClient
 
         switch (futariMsg.FutariCmd)
         {
+            // Server registration response with version
+            case FutariCmd.CTL_START:
+                if (!string.IsNullOrEmpty(futariMsg.data))
+                {
+                    Log.Info($"Server registration response: {futariMsg.data}");
+                    // Parse version if present (format: "version=X")
+                    if (futariMsg.data.StartsWith("version="))
+                    {
+                        var versionStr = futariMsg.data.Substring("version=".Length);
+                        if (int.TryParse(versionStr, out var version))
+                        {
+                            Log.Info($"Server protocol version: {version}");
+                        }
+                    }
+                }
+                break;
+            
             // Heartbeat
             case FutariCmd.CTL_HEARTBEAT:
                 var delay = _heartbeat.ElapsedMilliseconds;

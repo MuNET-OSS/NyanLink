@@ -9,6 +9,7 @@ namespace WorldLink;
 public class Config
 {
     public string LobbyUrl { get; set; }
+    public string RelayUrl { get; set; }
     public bool Debug { get; set; }
 }
 

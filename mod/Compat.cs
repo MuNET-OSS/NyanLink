@@ -1,5 +1,3 @@
-
-
 using MelonLoader;
 using WorldLink;
 
@@ -7,7 +5,12 @@ static class AquaMai
 {
     public static string ReadString(string key)
     {
-        return key == "Mods.WorldLink.LobbyUrl" ? Core.Config.LobbyUrl : null;
+        return key switch
+        {
+            "Mods.WorldLink.LobbyUrl" => Core.Config.LobbyUrl,
+            "Mods.WorldLink.RelayUrl" => Core.Config.RelayUrl,
+            _ => null
+        };
     }
 }
 

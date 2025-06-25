@@ -16,8 +16,8 @@ fun main(args: Array<String>) {
     val relayPort = parsePort(args, "--relay-port", "RELAY_PORT", 20101)
     
     println("=== WorldLink Server Configuration ===")
-    println("Lobby Port (HTTP API): $lobbyPort")
-    println("Relay Port (Game Communication): $relayPort")
+    println("Lobby Port: $lobbyPort")
+    println("Relay Port: $relayPort")
     println("=====================================")
     
     embeddedServer(Netty, port = lobbyPort, module = Application::module).start()

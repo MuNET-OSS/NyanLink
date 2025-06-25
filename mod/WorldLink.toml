@@ -1,4 +1,3 @@
-
 # WorldLink configuration file
 # 
 # The Lobby URL can be one of {asia, euro, usw, use, cn}.link.aquadx.net
@@ -11,6 +10,12 @@
 #
 # NOTE: If you're playing with your friend, make sure you both use the same Lobby URL.
 LobbyUrl="https://euro.link.aquadx.net"
+
+# Optional: Custom relay server URL
+# If not specified or blank, the mod will use the relay server info from the lobby server
+# Format: "hostname:port" or "hostname" (defaults to port 20101)
+# Examples:
+# RelayUrl="relay.example.com:20101"
 
 # Show debug messages
 Debug=false

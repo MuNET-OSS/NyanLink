@@ -64,19 +64,31 @@ public static class Futari
         
         // Send HTTP request to get the futari client address
         client = new FutariClient("A1234567890", "", 20101);
-        $"{FutariClient.LOBBY_BASE}/info".GetAsync((sender, e) =>
+        
+        // Check if RelayUrl is configured
+        if (!string.IsNullOrEmpty(FutariClient.RELAY_BASE))
         {
-            if (e.Error != null)
+            // Use configured RelayUrl directly
+            try
             {
-                Log.Error($"Failed to get WorldLink server address: {e.Error}");
-                return;
+                var relayUri = new Uri(FutariClient.RELAY_BASE);
+                client.host = relayUri.Host;
+                client.port = relayUri.Port != -1 ? relayUri.Port : 20101; // Default to 20101 if no port specified
+                Log.Info($"Using configured relay server: {client.host}:{client.port}");
             }
-            // Response Format: {"relayHost": "google.com", "relayPort": 20101}
-            var info = JsonUtility.FromJson<ServerInfo>(e.Result);
-            client.host = info.relayHost;
-            client.port = info.relayPort;
-            Log.Info($"WorldLink server address: {info.relayHost}:{info.relayPort}");
-        });
+            catch (Exception ex)
+            {
+                Log.Error($"Invalid RelayUrl format: {FutariClient.RELAY_BASE}. Error: {ex.Message}");
+                Log.Info("Falling back to lobby server relay info");
+                // Fall back to lobby server method
+                GetRelayInfoFromLobby();
+            }
+        }
+        else
+        {
+            // Fall back to getting relay info from lobby server
+            GetRelayInfoFromLobby();
+        }
     }
 
     // Entrypoint
@@ -855,4 +867,22 @@ public static class Futari
 #endif
 
     #endregion
+
+    // Helper method to get relay info from lobby server
+    private static void GetRelayInfoFromLobby()
+    {
+        $"{FutariClient.LOBBY_BASE}/info".GetAsync((sender, e) =>
+        {
+            if (e.Error != null)
+            {
+                Log.Error($"Failed to get WorldLink server address: {e.Error}");
+                return;
+            }
+            // Response Format: {"relayHost": "google.com", "relayPort": 20101}
+            var info = JsonUtility.FromJson<ServerInfo>(e.Result);
+            client.host = info.relayHost;
+            client.port = info.relayPort;
+            Log.Info($"WorldLink server address: {info.relayHost}:{info.relayPort}");
+        });
+    }
 }

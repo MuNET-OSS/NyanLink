@@ -58,7 +58,16 @@ fun Application.configureRouting() = routing {
         recruits[d.ip] = d
 
         if (!exists) log(d, "StartRecruit")
-        d.RecruitInfo.MechaInfo.UserIDs = d.RecruitInfo.MechaInfo.UserIDs.map { it.str.hashToUInt().toLong() }
+        
+        // Backward compatibility: only hash UserIDs if they are strings (old clients)
+        // New clients already send hashed long values
+        d.RecruitInfo.MechaInfo.UserIDs = d.RecruitInfo.MechaInfo.UserIDs.map { userId ->
+            when (userId) {
+                is String -> userId.hashToUInt().toLong()
+                is Long -> userId
+                else -> userId.toString().hashToUInt().toLong()
+            }
+        }
     }
 
     post("/recruit/finish") {

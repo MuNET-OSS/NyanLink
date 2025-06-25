@@ -15,6 +15,8 @@ WorldLink maimai DX Online C2C Multiplayer Mod
 2. Download [WorldLink.dll](https://github.com/MewoLab/worldlinkd/releases/latest/download/WorldLink.dll), put it in Mods
 3. Download [WorldLink.toml](https://github.com/MewoLab/worldlinkd/blob/main/mod/WorldLink.toml)
 4. Edit `WorldLink.toml` to select a lobby server
+   - **LobbyUrl**: Required. Choose from `{asia, euro, usw, use, cn}.link.aquadx.net`
+   - **RelayUrl**: Optional. Custom relay server URL (e.g., `"myrelay.example.com:20101"`). If not specified, uses relay info from lobby server
 5. Start the game
 
 ### On KanadeDX
