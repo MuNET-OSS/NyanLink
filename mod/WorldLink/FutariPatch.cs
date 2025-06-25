@@ -23,8 +23,8 @@ using System.Threading;
 #endif
 
 [ConfigSection(
-    en: "Enable WorldLink Multiplayer",
-    zh: "启用 WorldLink 多人游戏",
+    en: "Enable NyaLink Multiplayer",
+    zh: "启用 NyaLink 多人游戏",
     defaultOn: false)]
 public static class Futari
 {
@@ -53,7 +53,7 @@ public static class Futari
     private static readonly MethodInfo SetRecruitData = typeof(MusicSelectProcess).GetProperty("RecruitData")!.SetMethod;
     public static void OnBeforePatch()
     {
-        Log.Info("Starting WorldLink patch...");
+        Log.Info("Starting NyaLink patch...");
 
         packetWriteUInt = typeof(Packet).GetMethod("write_uint", BindingFlags.NonPublic | BindingFlags.Static, null,
             new[]{typeof(PacketType), typeof(int), typeof(uint)}, null);
@@ -187,32 +187,32 @@ public static class Futari
         switch (client.StatusCode)
         {
             case -1:
-                ____buildVersionText.text = $"WorldLink Offline";
+                ____buildVersionText.text = $"NyaLink Offline";
                 ____buildVersionText.color = Color.red;
                 break;
             case 0:
-                ____buildVersionText.text = $"WorldLink Disconnect";
+                ____buildVersionText.text = $"NyaLink Disconnect";
                 ____buildVersionText.color = Color.gray;
                 break;
             case 1:
-                ____buildVersionText.text = $"WorldLink Connecting";
+                ____buildVersionText.text = $"NyaLink Connecting";
                 ____buildVersionText.color = Color.yellow;
                 break;
             case 2:
                 var recruitCount = PartyMan == null ? 0 : PartyMan.GetRecruitList().Count;
                 if (onlineUserCount > 0)
                 {
-                    ____buildVersionText.text = $"[WL] Room:{recruitCount} | Online:{onlineUserCount}";
+                    ____buildVersionText.text = $"[NL] Room:{recruitCount} | Online:{onlineUserCount}";
                     ____buildVersionText.color = recruitCount > 0 ? Color.green : Color.cyan;
                 }
                 else if (onlineUserCount == 0)
                 {
-                    ____buildVersionText.text = $"[WL] Online:0";
+                    ____buildVersionText.text = $"[NL] Online:0";
                     ____buildVersionText.color = Color.gray;
                 }
                 else
                 {
-                    ____buildVersionText.text = $"WorldLink Recruiting: {recruitCount}";
+                    ____buildVersionText.text = $"NyaLink Recruiting: {recruitCount}";
                     ____buildVersionText.color = Color.cyan;
                 }
                 break;
@@ -405,7 +405,7 @@ public static class Futari
     public static void postStartupOnUpdate(ref byte ____state, string[] ____statusMsg, string[] ____statusSubMsg)
     {
         // Status code
-        ____statusMsg[7] = "WORLD LINK";
+        ____statusMsg[7] = "NYALINK";
         ____statusSubMsg[7] = client.StatusCode switch
         {
             -1 => "BAD",
@@ -636,7 +636,7 @@ public static class Futari
         {
             // 设置房间信息显示
             var info = __instance.RecruitData.MechaInfo;
-            var players = "WorldLink Room! Players: " + 
+            var players = "NyaLink Room! Players: " + 
                           string.Join(" and ", info.UserNames.Where((_, i) => info.FumenDifs[i] != -1));
             
             __instance.MonitorArray.Where((_, i) => __instance.IsEntry(i))
@@ -875,14 +875,14 @@ public static class Futari
         {
             if (e.Error != null)
             {
-                Log.Error($"Failed to get WorldLink server address: {e.Error}");
+                Log.Error($"Failed to get NyaLink server address: {e.Error}");
                 return;
             }
             // Response Format: {"relayHost": "google.com", "relayPort": 20101}
             var info = JsonUtility.FromJson<ServerInfo>(e.Result);
             client.host = info.relayHost;
             client.port = info.relayPort;
-            Log.Info($"WorldLink server address: {info.relayHost}:{info.relayPort}");
+            Log.Info($"NyaLink server address: {info.relayHost}:{info.relayPort}");
         });
     }
 }
