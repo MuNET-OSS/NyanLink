@@ -255,6 +255,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Include="BuildInfo.cs" />
 		<Compile Include="Compat.cs" />
 		<Compile Include="Core.cs" />
 		<Compile Include="WorldLink\FutariClient.cs" />
@@ -262,5 +263,9 @@
 		<Compile Include="WorldLink\FutariPatch.cs" />
 		<Compile Include="WorldLink\FutariSocket.cs" />
 		<Compile Include="WorldLink\FutariTypes.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include=".config\dotnet-tools.json" />
 	</ItemGroup>
 </Project>

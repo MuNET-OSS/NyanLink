@@ -378,3 +378,5 @@ AMDaemon.NET.dll
 packages
 .DS_Store
 ._*
+*.g.cs
+tools

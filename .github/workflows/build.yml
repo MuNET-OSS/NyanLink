@@ -31,7 +31,10 @@ jobs:
         run: cp AquaMai-Build-Assets/WorldLinkLibs/* mod/Libs/
 
       - name: Build .NET Mod
-        run: cd mod && dotnet build -c Release
+        run: |
+          cd mod
+          dotnet tool restore
+          dotnet cake
 
       - name: Rename Artifacts
         run: |
