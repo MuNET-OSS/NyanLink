@@ -39,7 +39,7 @@ public static class Futari
     private static System.Threading.Thread onlineUserCountThread;
     private static System.Threading.Thread recruitListThread;
 
-    public static bool Debug = false;
+    public static bool Debug => WorldLink.Core.Config.Debug;
 
     #region Init
 
@@ -394,9 +394,10 @@ public static class Futari
     [HarmonyPatch(nameof(StartupProcess), nameof(StartupProcess.OnUpdate))]
     public static void postStartupOnUpdate(ref byte ____state, string[] ____statusMsg, string[] ____statusSubMsg)
     {
+        var msgCount = ____statusMsg.Length;
         // Status code
-        ____statusMsg[7] = "NyanLink";
-        ____statusSubMsg[7] = client.StatusCode switch
+        ____statusMsg[msgCount - 3] = "NyanLink";
+        ____statusSubMsg[msgCount - 3] = client.StatusCode switch
         {
             -1 => "BAD",
             0 => "Not Connect",
@@ -406,10 +407,13 @@ public static class Futari
         };
 
         // Delay
-        ____statusMsg[8] = "PING";
-        ____statusSubMsg[8] = client._delayAvg == 0 ? "N/A" : $"{client._delayAvg} ms";
-        ____statusMsg[9] = "CAT :3";
-        ____statusSubMsg[9] = client._delayIndex % 2 == 0 ? "" : "MEOW";
+        ____statusMsg[msgCount - 2] = "PING";
+        ____statusSubMsg[msgCount - 2] = client._delayAvg == 0 ? "N/A" : $"{client._delayAvg} ms";
+
+        var isThursday = DateTime.Now.DayOfWeek == DayOfWeek.Thursday;
+
+        ____statusMsg[msgCount - 1] = isThursday ? "CRAZY THURSDAY" : "CAT :3";
+        ____statusSubMsg[msgCount - 1] = client._delayIndex % 2 == 0 ? "" : (isThursday ? "V50" : "MEOW");
 
         // If it is in the wait link delivery state, change to ready immediately
         if (____state != 0x04) return;
