@@ -1,5 +1,4 @@
 ﻿using MelonLoader;
-using Tomlet;
 
 namespace WorldLink;
 
@@ -17,7 +16,7 @@ public class Core : MelonMod
     {
         // Load config
         LoggerInstance.Msg("Loading config...");
-        Config = TomletMain.To<Config>(File.ReadAllText("WorldLink.toml"));
+        Config = TomletShim.To<Config>(File.ReadAllText("WorldLink.toml"));
 
         LoggerInstance.Msg("Patching...");
         Futari.OnBeforePatch();
